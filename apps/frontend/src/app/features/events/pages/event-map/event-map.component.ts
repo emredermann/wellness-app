@@ -13,29 +13,34 @@ import { RouterLink } from '@angular/router';
 import * as L from 'leaflet';
 import { EventCategory, WellnessEvent } from '../../../../core/models/domain.models';
 import { EventService } from '../../../../core/services/event.service';
+import {
+  WellnessIconComponent,
+  WellnessIconName,
+} from '../../../../shared/components/icon/wellness-icon.component';
 import { EventDetailModalComponent } from '../../components/event-detail-modal/event-detail-modal.component';
 
 interface CategoryFilterOption {
   value?: EventCategory;
   label: string;
-  emoji: string;
+  icon: WellnessIconName;
 }
 
 @Component({
   selector: 'app-event-map',
   standalone: true,
-  imports: [DatePipe, RouterLink, EventDetailModalComponent],
+  imports: [DatePipe, RouterLink, EventDetailModalComponent, WellnessIconComponent],
   template: `
     <div class="relative flex h-[calc(100vh-9.5rem)] min-h-[540px] w-full flex-col overflow-hidden rounded-3xl border border-cream-300 bg-cream-50 shadow-soft">
       <!-- Üst Yüzen Filtre Barı & İşletme Paneli Geçişi -->
       <div class="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col gap-2.5 p-3 sm:p-4">
-        <div class="pointer-events-auto flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-cream-200/90 bg-cream-50/95 px-3.5 py-2.5 shadow-soft backdrop-blur-md">
+        <div class="pointer-events-auto flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-cream-200/90 bg-cream-50/95 px-4 py-2.5 shadow-soft backdrop-blur-md">
           <div>
-            <span class="text-[11px] font-semibold tracking-wide text-sage-700 uppercase">
-              Modül 4 · Yerel Etkinlik Haritası
+            <span class="inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider text-sage-700 uppercase">
+              <app-icon name="compass" sizeClass="h-3.5 w-3.5" />
+              <span>Yerel Etkinlik Haritası</span>
             </span>
-            <h1 class="text-sm font-bold text-ink-900 sm:text-base">
-              Açık Hava & Stüdyo Buluşmaları ({{ eventService.events().length }} Pin)
+            <h1 class="text-base text-ink-900 sm:text-lg">
+              Açık Hava & Stüdyo Buluşmaları ({{ eventService.events().length }} Nokta)
             </h1>
           </div>
 
@@ -43,20 +48,22 @@ interface CategoryFilterOption {
             <button
               type="button"
               (click)="locateUser()"
-              class="rounded-xl border border-sage-300 bg-white px-3 py-1.5 text-xs font-semibold text-sage-800 transition hover:bg-sage-50"
+              class="inline-flex items-center gap-1.5 rounded-xl border border-sage-300 bg-white px-3 py-1.5 text-xs font-semibold text-sage-800 transition hover:bg-sage-50"
             >
-              📍 Konumuma Git
+              <app-icon name="map-pin" sizeClass="h-3.5 w-3.5 text-sage-600" />
+              <span>Konumuma Git</span>
             </button>
             <a
               routerLink="/app/map/organizer"
-              class="rounded-xl bg-lavender-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-lavender-700"
+              class="inline-flex items-center gap-1.5 rounded-xl bg-lavender-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-lavender-700"
             >
-              + Kulüp / Etkinlik Ekle
+              <app-icon name="plus" sizeClass="h-3.5 w-3.5" />
+              <span>Kulüp / Etkinlik Ekle</span>
             </a>
           </div>
         </div>
 
-        <!-- Spor Branşlarına Göre Filtreleme Butonları -->
+        <!-- Spor Branşlarına Göre Filtreleme Butonları (SVG İkonlarla) -->
         <div class="pointer-events-auto flex items-center gap-1.5 overflow-x-auto pb-1">
           @for (item of categoryFilters; track item.label) {
             <button
@@ -70,7 +77,7 @@ interface CategoryFilterOption {
               [class.bg-cream-50/95]="selectedCategory() !== item.value"
               [class.text-ink-700]="selectedCategory() !== item.value"
             >
-              <span>{{ item.emoji }}</span>
+              <app-icon [name]="item.icon" sizeClass="h-3.5 w-3.5" />
               <span>{{ item.label }}</span>
             </button>
           }
@@ -89,8 +96,9 @@ interface CategoryFilterOption {
           <div class="mx-auto max-w-3xl">
             <div class="mb-2 flex items-center justify-between">
               <div class="flex flex-wrap items-center gap-2">
-                <span class="rounded-full bg-sage-100 px-2.5 py-0.5 text-xs font-semibold text-sage-800">
-                  {{ categoryLabel(ev.category) }}
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-2.5 py-0.5 text-xs font-semibold text-sage-800">
+                  <app-icon [name]="categoryIcon(ev.category)" sizeClass="h-3.5 w-3.5" />
+                  <span>{{ categoryLabel(ev.category) }}</span>
                 </span>
                 <span
                   class="rounded-full px-2.5 py-0.5 text-xs font-bold"
@@ -102,8 +110,9 @@ interface CategoryFilterOption {
                   {{ ev.isFree ? 'Ücretsiz' : ev.price + ' ₺' }}
                 </span>
                 @if (eventService.getBookingForEvent(ev.id); as booking) {
-                  <span class="rounded-full bg-sage-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
-                    ✓ Kayıtlısın ({{ booking.qrCode }})
+                  <span class="inline-flex items-center gap-1 rounded-full bg-sage-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                    <app-icon name="check" sizeClass="h-3 w-3" />
+                    <span>Kayıtlısın ({{ booking.qrCode }})</span>
                   </span>
                 }
               </div>
@@ -111,20 +120,30 @@ interface CategoryFilterOption {
               <button
                 type="button"
                 (click)="selectedEvent.set(null)"
-                class="rounded-lg px-2 py-1 text-xs font-medium text-ink-400 hover:text-ink-900"
+                class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-ink-400 hover:text-ink-900"
               >
-                Kapat ✕
+                <span>Kapat</span>
+                <app-icon name="close" sizeClass="h-3.5 w-3.5" />
               </button>
             </div>
 
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
-                <h2 class="text-base font-bold text-ink-900 sm:text-lg">{{ ev.title }}</h2>
+                <h2 class="text-lg text-ink-900 sm:text-xl">{{ ev.title }}</h2>
                 <p class="mt-0.5 line-clamp-2 text-xs text-ink-700">{{ ev.description }}</p>
                 <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-500">
-                  <span>🗓️ {{ ev.date | date: 'dd MMM yyyy · HH:mm' }}</span>
-                  <span>👥 Kontenjan: {{ ev.capacity }} kişi</span>
-                  <span>📍 {{ ev.address }}</span>
+                  <span class="inline-flex items-center gap-1">
+                    <app-icon name="calendar" sizeClass="h-3.5 w-3.5 text-sage-600" />
+                    <span>{{ ev.date | date: 'dd MMM yyyy · HH:mm' }}</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1">
+                    <app-icon name="users" sizeClass="h-3.5 w-3.5 text-lavender-600" />
+                    <span>Kontenjan: {{ ev.capacity }} kişi</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1">
+                    <app-icon name="map-pin" sizeClass="h-3.5 w-3.5 text-sage-600" />
+                    <span>{{ ev.address }}</span>
+                  </span>
                 </div>
               </div>
 
@@ -132,13 +151,16 @@ interface CategoryFilterOption {
                 <button
                   type="button"
                   (click)="openBookingModal(ev)"
-                  class="rounded-2xl bg-sage-600 px-4 py-2.5 text-xs font-semibold text-white shadow-soft transition hover:bg-sage-700"
+                  class="inline-flex items-center gap-1.5 rounded-2xl bg-sage-600 px-4 py-2.5 text-xs font-semibold text-white shadow-soft transition hover:bg-sage-700"
                 >
-                  {{
-                    eventService.getBookingForEvent(ev.id)
-                      ? 'QR Biletini Gör'
-                      : 'Katıl / Rezervasyon Yap'
-                  }}
+                  <app-icon name="qr" sizeClass="h-4 w-4" />
+                  <span>
+                    {{
+                      eventService.getBookingForEvent(ev.id)
+                        ? 'QR Biletini Gör'
+                        : 'Katıl / Rezervasyon Yap'
+                    }}
+                  </span>
                 </button>
               </div>
             </div>
@@ -170,13 +192,13 @@ export class EventMapComponent implements AfterViewInit, OnDestroy {
   private markerLayer?: L.LayerGroup;
 
   protected readonly categoryFilters: CategoryFilterOption[] = [
-    { value: undefined, label: 'Tümü', emoji: '🌿' },
-    { value: 'RUNNING', label: 'Koşu', emoji: '🏃‍♀️' },
-    { value: 'YOGA', label: 'Yoga', emoji: '🧘‍♀️' },
-    { value: 'PILATES', label: 'Pilates', emoji: '🤸‍♀️' },
-    { value: 'SAILING', label: 'Yelken', emoji: '⛵' },
-    { value: 'HIKING', label: 'Doğa Yürüyüşü', emoji: '🥾' },
-    { value: 'MEDITATION', label: 'Meditasyon', emoji: '🕯️' },
+    { value: undefined, label: 'Tümü', icon: 'lotus' },
+    { value: 'RUNNING', label: 'Koşu', icon: 'running' },
+    { value: 'YOGA', label: 'Yoga', icon: 'yoga' },
+    { value: 'PILATES', label: 'Pilates', icon: 'pilates' },
+    { value: 'SAILING', label: 'Yelken', icon: 'sailing' },
+    { value: 'HIKING', label: 'Doğa Yürüyüşü', icon: 'hiking' },
+    { value: 'MEDITATION', label: 'Meditasyon', icon: 'meditation' },
   ];
 
   constructor() {
@@ -233,9 +255,12 @@ export class EventMapComponent implements AfterViewInit, OnDestroy {
     this.modalEvent.set(ev);
   }
 
+  protected categoryIcon(cat: EventCategory): WellnessIconName {
+    return this.categoryFilters.find((c) => c.value === cat)?.icon ?? 'lotus';
+  }
+
   protected categoryLabel(cat: EventCategory): string {
-    const found = this.categoryFilters.find((c) => c.value === cat);
-    return found ? `${found.emoji} ${found.label}` : cat;
+    return this.categoryFilters.find((c) => c.value === cat)?.label ?? cat;
   }
 
   private initMap(): void {
@@ -263,26 +288,26 @@ export class EventMapComponent implements AfterViewInit, OnDestroy {
     this.markerLayer.clearLayers();
 
     for (const ev of events) {
-      const emoji = this.categoryEmoji(ev.category);
       const isBooked = Boolean(this.eventService.getBookingForEvent(ev.id));
 
       const icon = L.divIcon({
         className: 'wl-leaflet-pin',
         html: `
           <div style="
-            display:flex;align-items:center;gap:6px;
-            padding:6px 10px;border-radius:9999px;
-            background:${isBooked ? '#7a5cb1' : '#4a7a5c'};
-            color:#ffffff;font-weight:700;font-size:12px;
-            box-shadow:0 8px 20px -6px rgba(42,65,52,0.45);
-            border:2px solid #fffdf8;white-space:nowrap;
+            display:inline-flex;align-items:center;gap:6px;
+            padding:6px 12px;border-radius:9999px;
+            background:${isBooked ? '#74539e' : '#426e57'};
+            color:#ffffff;font-weight:700;font-size:11px;
+            font-family:'Plus Jakarta Sans',sans-serif;
+            box-shadow:0 10px 24px -6px rgba(35,31,28,0.42);
+            border:2px solid #fdfbf8;white-space:nowrap;
           ">
-            <span>${emoji}</span>
-            <span>${ev.isFree ? 'Ücretsiz' : ev.price + '₺'}</span>
+            <span style="width:7px;height:7px;border-radius:9999px;background:#f8f4ec;display:inline-block;"></span>
+            <span>${this.categoryLabel(ev.category)} · ${ev.isFree ? 'Ücretsiz' : ev.price + '₺'}</span>
           </div>
         `,
-        iconSize: [92, 34],
-        iconAnchor: [46, 17],
+        iconSize: [118, 34],
+        iconAnchor: [59, 17],
       });
 
       const marker = L.marker([ev.latitude, ev.longitude], { icon });
@@ -296,9 +321,5 @@ export class EventMapComponent implements AfterViewInit, OnDestroy {
     if (!this.selectedEvent() && events.length > 0) {
       this.selectedEvent.set(events[0]);
     }
-  }
-
-  private categoryEmoji(cat: EventCategory): string {
-    return this.categoryFilters.find((c) => c.value === cat)?.emoji ?? '🌿';
   }
 }

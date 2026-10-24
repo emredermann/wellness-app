@@ -2,6 +2,10 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DietType, EventCategory } from '../../../../core/models/domain.models';
 import { ProfileService } from '../../../../core/services/profile.service';
+import {
+  WellnessIconComponent,
+  WellnessIconName,
+} from '../../../../shared/components/icon/wellness-icon.component';
 
 type ProfileTab = 'cycle' | 'preferences' | 'kvkk';
 
@@ -18,16 +22,17 @@ interface CalendarDayCell {
 @Component({
   selector: 'app-profile-cycle',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, WellnessIconComponent],
   template: `
     <div class="space-y-6">
       <!-- Başlık & Sekme Geçişleri -->
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p class="text-xs font-medium tracking-wide text-lavender-700 uppercase">
-            Kişisel Alan & Döngü Yönetimi
+          <p class="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-lavender-700 uppercase">
+            <app-icon name="moon" sizeClass="h-3.5 w-3.5" />
+            <span>Kişisel Alan & Döngü Yönetimi</span>
           </p>
-          <h1 class="text-2xl font-bold text-ink-900">{{ profileService.profile().name }}</h1>
+          <h1 class="mt-1 text-3xl text-ink-900">{{ profileService.profile().name }}</h1>
           <p class="text-xs text-ink-500">{{ profileService.profile().email }}</p>
         </div>
 
@@ -35,39 +40,43 @@ interface CalendarDayCell {
           <button
             type="button"
             (click)="activeTab.set('cycle')"
-            class="rounded-xl px-3.5 py-2 text-xs font-semibold transition"
-            [class.bg-sage-500]="activeTab() === 'cycle'"
+            class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+            [class.bg-sage-600]="activeTab() === 'cycle'"
             [class.text-white]="activeTab() === 'cycle'"
             [class.text-ink-700]="activeTab() !== 'cycle'"
           >
-            Döngü Takvimi
+            <app-icon name="calendar" sizeClass="h-3.5 w-3.5" />
+            <span>Döngü Takvimi</span>
           </button>
           <button
             type="button"
             (click)="activeTab.set('preferences')"
-            class="rounded-xl px-3.5 py-2 text-xs font-semibold transition"
-            [class.bg-sage-500]="activeTab() === 'preferences'"
+            class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+            [class.bg-sage-600]="activeTab() === 'preferences'"
             [class.text-white]="activeTab() === 'preferences'"
             [class.text-ink-700]="activeTab() !== 'preferences'"
           >
-            Diyet & Spor Tercihi
+            <app-icon name="leaf" sizeClass="h-3.5 w-3.5" />
+            <span>Diyet & Spor Tercihi</span>
           </button>
           <button
             type="button"
             (click)="activeTab.set('kvkk')"
-            class="rounded-xl px-3.5 py-2 text-xs font-semibold transition"
-            [class.bg-sage-500]="activeTab() === 'kvkk'"
+            class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+            [class.bg-sage-600]="activeTab() === 'kvkk'"
             [class.text-white]="activeTab() === 'kvkk'"
             [class.text-ink-700]="activeTab() !== 'kvkk'"
           >
-            KVKK Veri Yönetimi
+            <app-icon name="shield-check" sizeClass="h-3.5 w-3.5" />
+            <span>KVKK Veri Yönetimi</span>
           </button>
         </div>
       </div>
 
       @if (toastMessage()) {
-        <div class="rounded-2xl border border-sage-300 bg-sage-50 px-4 py-3 text-xs font-semibold text-sage-800">
-          ✓ {{ toastMessage() }}
+        <div class="flex items-center gap-2 rounded-2xl border border-sage-300 bg-sage-50 px-4 py-3 text-xs font-semibold text-sage-800">
+          <app-icon name="check" sizeClass="h-4 w-4 text-sage-600" />
+          <span>{{ toastMessage() }}</span>
         </div>
       }
 
@@ -78,7 +87,7 @@ interface CalendarDayCell {
           <section class="wl-card space-y-4">
             <div class="flex items-center justify-between">
               <div>
-                <h2 class="text-base font-bold text-ink-900">Döngü Başlangıç Takvimi</h2>
+                <h2 class="text-xl text-ink-900">Döngü Başlangıç Takvimi</h2>
                 <p class="text-xs text-ink-500">
                   Son regl başlangıç gününe dokunarak döngü fazlarını anında güncelle
                 </p>
@@ -87,19 +96,21 @@ interface CalendarDayCell {
                 <button
                   type="button"
                   (click)="shiftMonth(-1)"
-                  class="rounded-xl border border-cream-300 bg-white px-2.5 py-1 text-xs font-bold text-ink-700 hover:border-sage-300"
+                  aria-label="Önceki Ay"
+                  class="flex h-8 w-8 items-center justify-center rounded-xl border border-cream-300 bg-white text-ink-700 hover:border-sage-400"
                 >
-                  ‹
+                  <app-icon name="chevron-left" sizeClass="h-4 w-4" />
                 </button>
-                <span class="min-w-28 text-center text-xs font-semibold text-ink-900">
+                <span class="min-w-28 text-center text-xs font-bold capitalize text-ink-900">
                   {{ currentMonthLabel() }}
                 </span>
                 <button
                   type="button"
                   (click)="shiftMonth(1)"
-                  class="rounded-xl border border-cream-300 bg-white px-2.5 py-1 text-xs font-bold text-ink-700 hover:border-sage-300"
+                  aria-label="Sonraki Ay"
+                  class="flex h-8 w-8 items-center justify-center rounded-xl border border-cream-300 bg-white text-ink-700 hover:border-sage-400"
                 >
-                  ›
+                  <app-icon name="chevron-right" sizeClass="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -119,16 +130,16 @@ interface CalendarDayCell {
                   (click)="selectCycleStartDate(cell.iso)"
                   class="relative flex h-11 flex-col items-center justify-center rounded-xl border text-xs transition"
                   [class.opacity-35]="!cell.inCurrentMonth"
-                  [class.border-sage-600]="cell.isCycleStart"
-                  [class.bg-sage-500]="cell.isCycleStart"
+                  [class.border-sage-700]="cell.isCycleStart"
+                  [class.bg-sage-600]="cell.isCycleStart"
                   [class.text-white]="cell.isCycleStart"
                   [class.font-bold]="cell.isCycleStart || cell.isToday"
-                  [class.border-rose-200]="!cell.isCycleStart && cell.isPeriodWindow"
-                  [class.bg-rose-50]="!cell.isCycleStart && cell.isPeriodWindow"
-                  [class.text-rose-800]="!cell.isCycleStart && cell.isPeriodWindow"
-                  [class.border-lavender-300]="!cell.isCycleStart && !cell.isPeriodWindow && cell.isOvulationWindow"
-                  [class.bg-lavender-50]="!cell.isCycleStart && !cell.isPeriodWindow && cell.isOvulationWindow"
-                  [class.text-lavender-700]="!cell.isCycleStart && !cell.isPeriodWindow && cell.isOvulationWindow"
+                  [class.border-terracotta-200]="!cell.isCycleStart && cell.isPeriodWindow"
+                  [class.bg-terracotta-50]="!cell.isCycleStart && cell.isPeriodWindow"
+                  [class.text-terracotta-700]="!cell.isCycleStart && cell.isPeriodWindow"
+                  [class.border-amber-200]="!cell.isCycleStart && !cell.isPeriodWindow && cell.isOvulationWindow"
+                  [class.bg-amber-50]="!cell.isCycleStart && !cell.isPeriodWindow && cell.isOvulationWindow"
+                  [class.text-amber-700]="!cell.isCycleStart && !cell.isPeriodWindow && cell.isOvulationWindow"
                   [class.border-cream-200]="!cell.isCycleStart && !cell.isPeriodWindow && !cell.isOvulationWindow"
                   [class.bg-white]="!cell.isCycleStart && !cell.isPeriodWindow && !cell.isOvulationWindow"
                 >
@@ -143,20 +154,20 @@ interface CalendarDayCell {
             <!-- Renk Açıklamaları -->
             <div class="flex flex-wrap items-center gap-4 border-t border-cream-200 pt-3 text-[11px] text-ink-500">
               <span class="inline-flex items-center gap-1.5">
-                <span class="h-3 w-3 rounded bg-sage-500"></span> Başlangıç Günü
+                <span class="h-3 w-3 rounded bg-sage-600"></span> Başlangıç Günü
               </span>
               <span class="inline-flex items-center gap-1.5">
-                <span class="h-3 w-3 rounded border border-rose-200 bg-rose-50"></span> Menstrüel Günler (1-5)
+                <span class="h-3 w-3 rounded border border-terracotta-200 bg-terracotta-50"></span> Menstrüel Günler (1-5)
               </span>
               <span class="inline-flex items-center gap-1.5">
-                <span class="h-3 w-3 rounded border border-lavender-300 bg-lavender-50"></span> Tahmini Ovulasyon Penceresi
+                <span class="h-3 w-3 rounded border border-amber-200 bg-amber-50"></span> Tahmini Ovulasyon Penceresi
               </span>
             </div>
           </section>
 
           <!-- Döngü Parametreleri Formu -->
           <section class="wl-card space-y-4">
-            <h2 class="text-base font-bold text-ink-900">Döngü Ayarları</h2>
+            <h2 class="text-xl text-ink-900">Döngü Ayarları</h2>
 
             <form [formGroup]="cycleForm" (ngSubmit)="saveCycleSettings()" class="space-y-4">
               <div>
@@ -213,7 +224,8 @@ interface CalendarDayCell {
               </div>
 
               <button type="submit" class="wl-btn-primary">
-                Döngü Bilgilerini Kaydet
+                <app-icon name="check" sizeClass="h-4 w-4" />
+                <span>Döngü Bilgilerini Kaydet</span>
               </button>
             </form>
           </section>
@@ -224,13 +236,13 @@ interface CalendarDayCell {
       @if (activeTab() === 'preferences') {
         <section class="wl-card space-y-6">
           <div>
-            <h2 class="text-base font-bold text-ink-900">Beslenme & Spor Stili Tercihleri</h2>
+            <h2 class="text-xl text-ink-900">Beslenme & Spor Stili Tercihleri</h2>
             <p class="text-xs text-ink-500">
               "Bugün" ekranındaki tarifler ve yakın etkinlik önerileri bu seçimlere göre filtrelenir.
             </p>
           </div>
 
-          <!-- Diyet Tipi Seçimi (Vegan, Vejetaryen, Pesketaryen, Normal) -->
+          <!-- Diyet Tipi Seçimi -->
           <div class="space-y-2.5">
             <span class="wl-label">Diyet Tipi</span>
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -239,20 +251,22 @@ interface CalendarDayCell {
                   type="button"
                   (click)="selectedDiet.set(diet.value)"
                   class="flex flex-col items-start rounded-2xl border p-4 text-left transition"
-                  [class.border-sage-500]="selectedDiet() === diet.value"
+                  [class.border-sage-600]="selectedDiet() === diet.value"
                   [class.bg-sage-50]="selectedDiet() === diet.value"
                   [class.border-cream-300]="selectedDiet() !== diet.value"
                   [class.bg-white]="selectedDiet() !== diet.value"
                 >
-                  <span class="text-lg">{{ diet.emoji }}</span>
-                  <span class="mt-1.5 text-sm font-bold text-ink-900">{{ diet.label }}</span>
-                  <span class="mt-0.5 text-[11px] text-ink-500">{{ diet.description }}</span>
+                  <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-sage-100 text-sage-700">
+                    <app-icon [name]="diet.icon" sizeClass="h-5 w-5" />
+                  </span>
+                  <span class="mt-2.5 text-sm font-bold text-ink-900">{{ diet.label }}</span>
+                  <span class="mt-0.5 text-[11px] leading-relaxed text-ink-500">{{ diet.description }}</span>
                 </button>
               }
             </div>
           </div>
 
-          <!-- Spor Stili Tercihi (Çoklu Seçim) -->
+          <!-- Spor Stili Tercihi -->
           <div class="space-y-2.5">
             <span class="wl-label">Favori Spor & Hareket Stillerin</span>
             <div class="flex flex-wrap gap-2.5">
@@ -268,7 +282,7 @@ interface CalendarDayCell {
                   [class.bg-white]="!isSportSelected(sport.value)"
                   [class.text-ink-700]="!isSportSelected(sport.value)"
                 >
-                  <span>{{ sport.emoji }}</span>
+                  <app-icon [name]="sport.icon" sizeClass="h-4 w-4" />
                   <span>{{ sport.label }}</span>
                 </button>
               }
@@ -287,7 +301,7 @@ interface CalendarDayCell {
               type="button"
               (click)="profileService.toggleCaloriesVisibility()"
               class="rounded-xl px-4 py-2 text-xs font-semibold transition"
-              [class.bg-sage-500]="profileService.hideCalories()"
+              [class.bg-sage-600]="profileService.hideCalories()"
               [class.text-white]="profileService.hideCalories()"
               [class.bg-cream-200]="!profileService.hideCalories()"
               [class.text-ink-700]="!profileService.hideCalories()"
@@ -302,20 +316,22 @@ interface CalendarDayCell {
               (click)="saveDietAndSportPreferences()"
               class="wl-btn-primary sm:w-auto"
             >
-              Tercihleri Güncelle
+              <app-icon name="check" sizeClass="h-4 w-4" />
+              <span>Tercihleri Güncelle</span>
             </button>
           </div>
         </section>
       }
 
-      <!-- SEKME 3: KVKK VERİ YÖNETİMİ (VERİLERİMİ İNDİR / HESABIMI SİL) -->
+      <!-- SEKME 3: KVKK VERİ YÖNETİMİ -->
       @if (activeTab() === 'kvkk') {
         <section class="wl-card space-y-6">
           <div>
-            <span class="rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
-              6698 Sayılı KVKK Kapsamında Hakların
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
+              <app-icon name="shield-check" sizeClass="h-3.5 w-3.5" />
+              <span>6698 Sayılı KVKK Kapsamında Hakların</span>
             </span>
-            <h2 class="mt-2 text-lg font-bold text-ink-900">Kişisel Veri Yönetimi ve Şeffaflık</h2>
+            <h2 class="mt-2 text-xl text-ink-900">Kişisel Veri Yönetimi ve Şeffaflık</h2>
             <p class="mt-1 text-xs leading-relaxed text-ink-500">
               Sağlık ve döngü verilerin yalnızca senin kontrolündedir. İstediğin zaman tüm veri
               kopyanı indirebilir veya hesabını kalıcı olarak silebilirsin.
@@ -326,7 +342,10 @@ interface CalendarDayCell {
             <!-- Verilerimi İndir -->
             <div class="flex flex-col justify-between rounded-2xl border border-sage-200 bg-sage-50/60 p-5">
               <div>
-                <h3 class="text-sm font-bold text-ink-900">📥 Verilerimi İndir (JSON Taşınabilirlik)</h3>
+                <div class="flex items-center gap-2 text-ink-900">
+                  <app-icon name="download" sizeClass="h-4 w-4 text-sage-700" />
+                  <h3 class="text-sm font-bold">Verilerimi İndir (JSON Taşınabilirlik)</h3>
+                </div>
                 <p class="mt-1.5 text-xs leading-relaxed text-ink-700">
                   Profil bilgilerin, döngü başlangıç tarihin, beslenme ve spor tercihlerinle birlikte
                   KVKK onay kaydını makinece okunabilir <code>.json</code> formatında cihazına indirir.
@@ -335,17 +354,21 @@ interface CalendarDayCell {
               <button
                 type="button"
                 (click)="downloadKvkkData()"
-                class="mt-5 inline-flex items-center justify-center rounded-xl bg-sage-600 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-sage-700"
+                class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-sage-600 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-sage-700"
               >
-                Verilerimi İndir (.json)
+                <app-icon name="download" sizeClass="h-4 w-4" />
+                <span>Verilerimi İndir (.json)</span>
               </button>
             </div>
 
             <!-- Hesabımı Sil -->
-            <div class="flex flex-col justify-between rounded-2xl border border-rose-200 bg-rose-50/60 p-5">
+            <div class="flex flex-col justify-between rounded-2xl border border-terracotta-200 bg-terracotta-50/70 p-5">
               <div>
-                <h3 class="text-sm font-bold text-rose-900">🗑️ Hesabımı ve Verilerimi Kalıcı Sil</h3>
-                <p class="mt-1.5 text-xs leading-relaxed text-rose-800">
+                <div class="flex items-center gap-2 text-terracotta-700">
+                  <app-icon name="trash" sizeClass="h-4 w-4" />
+                  <h3 class="text-sm font-bold">Hesabımı ve Verilerimi Kalıcı Sil</h3>
+                </div>
+                <p class="mt-1.5 text-xs leading-relaxed text-ink-700">
                   KVKK Madde 7 (Unutulma Hakkı) kapsamında profilin, döngü geçmişin ve etkinlik
                   biletlerin geri döndürülemez biçimde silinir ve oturumun kapatılır.
                 </p>
@@ -355,20 +378,21 @@ interface CalendarDayCell {
                 <button
                   type="button"
                   (click)="confirmDelete.set(true)"
-                  class="mt-5 inline-flex items-center justify-center rounded-xl border border-rose-300 bg-white px-4 py-2.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
+                  class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-terracotta-200 bg-white px-4 py-2.5 text-xs font-semibold text-terracotta-700 transition hover:bg-terracotta-100"
                 >
-                  Hesabımı Sil
+                  <app-icon name="trash" sizeClass="h-4 w-4" />
+                  <span>Hesabımı Sil</span>
                 </button>
               } @else {
                 <div class="mt-4 space-y-2 rounded-xl bg-white p-3">
-                  <p class="text-[11px] font-semibold text-rose-800">
+                  <p class="text-[11px] font-semibold text-terracotta-700">
                     Bu işlem geri alınamaz. Onaylıyor musunuz?
                   </p>
                   <div class="flex gap-2">
                     <button
                       type="button"
                       (click)="executeAccountDeletion()"
-                      class="flex-1 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700"
+                      class="flex-1 rounded-lg bg-terracotta-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-terracotta-700"
                     >
                       Evet, Kalıcı Olarak Sil
                     </button>
@@ -418,45 +442,49 @@ export class ProfileCycleComponent {
   protected readonly dietOptions: {
     value: DietType;
     label: string;
-    emoji: string;
+    icon: WellnessIconName;
     description: string;
   }[] = [
     {
       value: 'VEGAN',
       label: 'Vegan',
-      emoji: '🌱',
-      description: 'Tamamen bitkisel, antioksidan ve lif odaklı tarifler.',
+      icon: 'sprout',
+      description: 'Tamamen bitkisel, antioksidan ve prebiyotik lif odaklı tarifler.',
     },
     {
       value: 'VEGETARIAN',
       label: 'Vejetaryen',
-      emoji: '🥗',
+      icon: 'leaf',
       description: 'Sebze, bakliyat, yumurta ve fermente süt ürünleri.',
     },
     {
       value: 'PESCATARIAN',
       label: 'Pesketaryen',
-      emoji: '🐟',
+      icon: 'fish',
       description: 'Bitkisel ağırlıklı + Omega-3 zengini deniz ürünleri.',
     },
     {
       value: 'REGULAR',
       label: 'Normal',
-      emoji: '🍲',
-      description: 'Kısıtlama olmadan mevsimsel ve dengeli Anadolu/Akdeniz mutfağı.',
+      icon: 'bowl',
+      description: 'Mevsimsel ve dengeli Anadolu/Akdeniz mutfağı.',
     },
   ];
 
-  protected readonly sportOptions: { value: EventCategory; label: string; emoji: string }[] = [
-    { value: 'YOGA', label: 'Yoga', emoji: '🧘‍♀️' },
-    { value: 'PILATES', label: 'Pilates', emoji: '🤸‍♀️' },
-    { value: 'RUNNING', label: 'Koşu', emoji: '🏃‍♀️' },
-    { value: 'MEDITATION', label: 'Meditasyon & Nefes', emoji: '🕯️' },
-    { value: 'SAILING', label: 'Yelken', emoji: '⛵' },
-    { value: 'CYCLING', label: 'Bisiklet', emoji: '🚴‍♀️' },
-    { value: 'HIKING', label: 'Doğa Yürüyüşü', emoji: '🥾' },
-    { value: 'SWIMMING', label: 'Yüzme', emoji: '🏊‍♀️' },
-    { value: 'DANCE', label: 'Dans', emoji: '💃' },
+  protected readonly sportOptions: {
+    value: EventCategory;
+    label: string;
+    icon: WellnessIconName;
+  }[] = [
+    { value: 'YOGA', label: 'Yoga', icon: 'yoga' },
+    { value: 'PILATES', label: 'Pilates', icon: 'pilates' },
+    { value: 'RUNNING', label: 'Koşu', icon: 'running' },
+    { value: 'MEDITATION', label: 'Meditasyon & Nefes', icon: 'meditation' },
+    { value: 'SAILING', label: 'Yelken', icon: 'sailing' },
+    { value: 'CYCLING', label: 'Bisiklet', icon: 'cycling' },
+    { value: 'HIKING', label: 'Doğa Yürüyüşü', icon: 'hiking' },
+    { value: 'SWIMMING', label: 'Yüzme', icon: 'swimming' },
+    { value: 'DANCE', label: 'Dans', icon: 'dance' },
   ];
 
   protected readonly currentMonthLabel = computed(() =>
@@ -469,7 +497,7 @@ export class ProfileCycleComponent {
     const month = ref.getMonth();
 
     const firstOfMonth = new Date(year, month, 1);
-    const startOffset = (firstOfMonth.getDay() + 6) % 7; // Pazartesi = 0
+    const startOffset = (firstOfMonth.getDay() + 6) % 7;
     const gridStart = new Date(year, month, 1 - startOffset);
 
     const startIso =
@@ -486,7 +514,7 @@ export class ProfileCycleComponent {
       const d = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i);
       const iso = this.toIsoDate(d);
       const diff = Math.floor((d.getTime() - startDate.getTime()) / 86_400_000);
-      const modDay = ((diff % cycleLen) + cycleLen) % cycleLen; // 0-indexed
+      const modDay = ((diff % cycleLen) + cycleLen) % cycleLen;
 
       cells.push({
         iso,

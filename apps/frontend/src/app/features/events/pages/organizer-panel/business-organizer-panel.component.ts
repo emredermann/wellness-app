@@ -9,24 +9,26 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import * as L from 'leaflet';
 import { EventCategory } from '../../../../core/models/domain.models';
 import { EventService } from '../../../../core/services/event.service';
+import { WellnessIconComponent } from '../../../../shared/components/icon/wellness-icon.component';
 
 @Component({
   selector: 'app-business-organizer-panel',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, DatePipe],
+  imports: [ReactiveFormsModule, RouterLink, DatePipe, WellnessIconComponent],
   template: `
     <div class="space-y-6">
       <!-- Üst Başlık -->
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span class="rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
-            İşletme, Stüdyo & Spor Kulübü Paneli
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
+            <app-icon name="sparkle" sizeClass="h-3.5 w-3.5" />
+            <span>İşletme, Stüdyo & Spor Kulübü Paneli</span>
           </span>
-          <h1 class="mt-2 text-2xl font-bold text-ink-900">Yeni Wellness Etkinliği Oluştur</h1>
+          <h1 class="mt-2 text-3xl text-ink-900">Yeni Wellness Etkinliği Oluştur</h1>
           <p class="text-xs text-ink-500">
             Harita üzerinden buluşma noktasını seç, kontenjan ve bilet tipini belirleyerek yayınla.
           </p>
@@ -34,23 +36,27 @@ import { EventService } from '../../../../core/services/event.service';
 
         <a
           routerLink="/app/map"
-          class="rounded-2xl border border-cream-300 bg-cream-50 px-4 py-2.5 text-xs font-semibold text-ink-700 hover:border-sage-400"
+          class="inline-flex items-center gap-1.5 rounded-2xl border border-cream-300 bg-cream-50 px-4 py-2.5 text-xs font-semibold text-ink-700 hover:border-sage-400"
         >
-          ← Etkinlik Haritasına Dön
+          <app-icon name="chevron-left" sizeClass="h-4 w-4" />
+          <span>Etkinlik Haritasına Dön</span>
         </a>
       </div>
 
       @if (createdBanner()) {
         <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-sage-300 bg-sage-50 px-4 py-3 text-xs font-semibold text-sage-800">
-          <span>✓ Etkinlik başarıyla yayınlandı ve haritaya pin olarak eklendi!</span>
-          <a routerLink="/app/map" class="underline">Haritada Görüntüle →</a>
+          <span class="inline-flex items-center gap-1.5">
+            <app-icon name="check" sizeClass="h-4 w-4 text-sage-600" />
+            <span>Etkinlik başarıyla yayınlandı ve haritaya pin olarak eklendi!</span>
+          </span>
+          <a routerLink="/app/map" class="underline">Haritada Görüntüle</a>
         </div>
       }
 
       <div class="grid gap-6 lg:grid-cols-[1.15fr_1fr]">
         <!-- Sol: Etkinlik Yönetim Formu -->
         <section class="wl-card">
-          <h2 class="text-base font-bold text-ink-900">Etkinlik Bilgileri</h2>
+          <h2 class="text-xl text-ink-900">Etkinlik Bilgileri</h2>
 
           <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-4 space-y-4" novalidate>
             <div class="grid gap-4 sm:grid-cols-2">
@@ -159,7 +165,8 @@ import { EventService } from '../../../../core/services/event.service';
             </div>
 
             <button type="submit" [disabled]="form.invalid" class="wl-btn-primary">
-              Etkinliği Haritada Yayınla
+              <app-icon name="plus" sizeClass="h-4 w-4" />
+              <span>Etkinliği Haritada Yayınla</span>
             </button>
           </form>
         </section>
@@ -169,7 +176,7 @@ import { EventService } from '../../../../core/services/event.service';
           <section class="wl-card space-y-3">
             <div class="flex items-center justify-between">
               <div>
-                <h2 class="text-base font-bold text-ink-900">Haritadan Konum Seçici</h2>
+                <h2 class="text-xl text-ink-900">Haritadan Konum Seçici</h2>
                 <p class="text-xs text-ink-500">
                   Haritada istediğin noktaya dokunarak etkinlik pinini yerleştir
                 </p>
@@ -185,9 +192,10 @@ import { EventService } from '../../../../core/services/event.service';
                 <button
                   type="button"
                   (click)="applyPreset(preset)"
-                  class="rounded-full border border-cream-300 bg-white px-2.5 py-1 text-[11px] font-medium text-ink-700 hover:border-sage-400"
+                  class="inline-flex items-center gap-1 rounded-full border border-cream-300 bg-white px-2.5 py-1 text-[11px] font-medium text-ink-700 hover:border-sage-400"
                 >
-                  📍 {{ preset.label }}
+                  <app-icon name="map-pin" sizeClass="h-3 w-3 text-sage-600" />
+                  <span>{{ preset.label }}</span>
                 </button>
               }
             </div>
@@ -223,9 +231,10 @@ import { EventService } from '../../../../core/services/event.service';
                     <button
                       type="button"
                       (click)="eventService.removeOrganizerEvent(item.id)"
-                      class="rounded-lg border border-rose-200 px-2.5 py-1 text-[11px] font-semibold text-rose-700 hover:bg-rose-50"
+                      class="inline-flex items-center gap-1 rounded-lg border border-terracotta-200 px-2.5 py-1 text-[11px] font-semibold text-terracotta-700 hover:bg-terracotta-50"
                     >
-                      Kaldır
+                      <app-icon name="trash" sizeClass="h-3.5 w-3.5" />
+                      <span>Kaldır</span>
                     </button>
                   </div>
                 }
@@ -243,7 +252,6 @@ export class BusinessOrganizerPanelComponent implements AfterViewInit, OnDestroy
 
   protected readonly eventService = inject(EventService);
   private readonly fb = inject(FormBuilder);
-  private readonly router = inject(Router);
 
   protected readonly createdBanner = signal(false);
 
@@ -251,15 +259,15 @@ export class BusinessOrganizerPanelComponent implements AfterViewInit, OnDestroy
   private pinMarker?: L.Marker;
 
   protected readonly categories: { value: EventCategory; label: string }[] = [
-    { value: 'YOGA', label: '🧘‍♀️ Yoga' },
-    { value: 'PILATES', label: '🤸‍♀️ Pilates' },
-    { value: 'RUNNING', label: '🏃‍♀️ Koşu Kulübü' },
-    { value: 'SAILING', label: '⛵ Yelken' },
-    { value: 'HIKING', label: '🥾 Doğa Yürüyüşü' },
-    { value: 'MEDITATION', label: '🕯️ Meditasyon & Nefes' },
-    { value: 'CYCLING', label: '🚴‍♀️ Bisiklet' },
-    { value: 'SWIMMING', label: '🏊‍♀️ Yüzme' },
-    { value: 'DANCE', label: '💃 Dans' },
+    { value: 'YOGA', label: 'Yoga' },
+    { value: 'PILATES', label: 'Pilates' },
+    { value: 'RUNNING', label: 'Koşu Kulübü' },
+    { value: 'SAILING', label: 'Yelken' },
+    { value: 'HIKING', label: 'Doğa Yürüyüşü' },
+    { value: 'MEDITATION', label: 'Meditasyon & Nefes' },
+    { value: 'CYCLING', label: 'Bisiklet' },
+    { value: 'SWIMMING', label: 'Yüzme' },
+    { value: 'DANCE', label: 'Dans' },
   ];
 
   protected readonly locationPresets = [
@@ -355,9 +363,9 @@ export class BusinessOrganizerPanelComponent implements AfterViewInit, OnDestroy
     if (!this.map) return;
     const icon = L.divIcon({
       className: 'wl-picker-pin',
-      html: `<div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9999px;background:#7a5cb1;color:#fff;font-size:16px;border:3px solid #fffdf8;box-shadow:0 6px 16px rgba(0,0,0,0.3);">📍</div>`,
-      iconSize: [34, 34],
-      iconAnchor: [17, 17],
+      html: `<div style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9999px;background:#74539e;color:#fff;border:3px solid #fdfbf8;box-shadow:0 6px 16px rgba(0,0,0,0.28);"><span style="width:10px;height:10px;border-radius:9999px;background:#fdfbf8;"></span></div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
     });
 
     if (this.pinMarker) {

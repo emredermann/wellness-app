@@ -2,27 +2,34 @@ import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular
 import { CyclePhase, SessionCategory } from '../../../../core/models/domain.models';
 import { ProfileService } from '../../../../core/services/profile.service';
 import { SessionService, WellnessSessionDetail } from '../../../../core/services/session.service';
+import {
+  WellnessIconComponent,
+  WellnessIconName,
+} from '../../../../shared/components/icon/wellness-icon.component';
 
 @Component({
   selector: 'app-session-list',
   standalone: true,
+  imports: [WellnessIconComponent],
   template: `
     <div class="space-y-6">
       <!-- Üst Başlık & Döngü Fazı Özeti -->
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p class="text-xs font-medium tracking-wide text-sage-700 uppercase">
-            Modül 5 · Mindful Hareket & Nefes Stüdyosu
+          <p class="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-sage-700 uppercase">
+            <app-icon name="lotus" sizeClass="h-3.5 w-3.5" />
+            <span>Mindful Hareket & Nefes Stüdyosu</span>
           </p>
-          <h1 class="text-2xl font-bold text-ink-900">Seanslar & Meditasyon Oynatıcı</h1>
+          <h1 class="mt-1 text-3xl text-ink-900">Seanslar & Meditasyon Oynatıcı</h1>
           <p class="text-xs text-ink-500">
             {{ profileService.cycleSnapshot().phaseLabel }} için önerilen sesli meditasyon, nefes
             koçu ve egzersiz akışları
           </p>
         </div>
 
-        <div class="flex items-center gap-2 rounded-2xl border border-sage-200 bg-sage-50 px-3.5 py-2 text-xs font-semibold text-sage-800">
-          <span>✨ Tamamlanan Seans:</span>
+        <div class="inline-flex items-center gap-2 rounded-2xl border border-sage-200 bg-sage-50 px-3.5 py-2 text-xs font-semibold text-sage-800">
+          <app-icon name="sparkle" sizeClass="h-4 w-4 text-sage-600" />
+          <span>Tamamlanan Seans:</span>
           <strong class="text-sm">{{ sessionService.completedCount() }}</strong>
         </div>
       </div>
@@ -36,7 +43,6 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
             <!-- Animasyonlu Nefes & Ses Frekansı Halkası -->
             <div class="mx-auto flex flex-col items-center">
               <div class="relative flex h-48 w-48 items-center justify-center">
-                <!-- Dış Genişleyen Nefes Halkası -->
                 <div
                   class="absolute inset-3 rounded-full bg-lavender-200/50 transition-transform duration-1000"
                   [class.scale-110]="isPlaying() && breathStage() === 'Nefes Al'"
@@ -44,7 +50,6 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
                   [class.scale-90]="isPlaying() && breathStage() === 'Yavaşça Ver'"
                 ></div>
 
-                <!-- SVG Zamanlayıcı Halkası -->
                 <svg class="relative h-44 w-44 -rotate-90" viewBox="0 0 160 160">
                   <circle
                     cx="80"
@@ -73,7 +78,7 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
                   <span class="rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-bold text-lavender-700">
                     {{ isPlaying() ? breathStage() : 'Hazır' }}
                   </span>
-                  <span class="mt-1 font-mono text-2xl font-extrabold text-ink-900">
+                  <span class="font-editorial mt-1 text-3xl text-ink-900">
                     {{ formattedTime() }}
                   </span>
                   <span class="text-[11px] text-ink-500">
@@ -83,27 +88,35 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
               </div>
 
               <!-- Oynatıcı Kontrolleri -->
-              <div class="mt-3 flex items-center gap-2">
+              <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
                 <button
                   type="button"
                   (click)="togglePlay()"
-                  class="rounded-2xl bg-sage-600 px-5 py-2.5 text-xs font-semibold text-white shadow-soft transition hover:bg-sage-700"
+                  class="inline-flex items-center gap-1.5 rounded-2xl bg-sage-600 px-5 py-2.5 text-xs font-semibold text-white shadow-soft transition hover:bg-sage-700"
                 >
-                  {{ isPlaying() ? '⏸ Duraklat' : '▶ Seansı Başlat' }}
+                  <app-icon [name]="isPlaying() ? 'pause' : 'play'" sizeClass="h-3.5 w-3.5" />
+                  <span>{{ isPlaying() ? 'Duraklat' : 'Seansı Başlat' }}</span>
                 </button>
                 <button
                   type="button"
                   (click)="toggleAmbientSound()"
-                  class="rounded-2xl border border-lavender-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-lavender-700 transition hover:bg-lavender-50"
+                  class="inline-flex items-center gap-1.5 rounded-2xl border border-lavender-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-lavender-700 transition hover:bg-lavender-50"
                 >
-                  {{ ambientSoundActive() ? '🔊 ' + current.ambientHz + ' Hz Açık' : '🔈 Ambient Ses' }}
+                  <app-icon
+                    [name]="ambientSoundActive() ? 'volume' : 'volume-off'"
+                    sizeClass="h-3.5 w-3.5"
+                  />
+                  <span>
+                    {{ ambientSoundActive() ? current.ambientHz + ' Hz Açık' : 'Ambient Ses' }}
+                  </span>
                 </button>
                 <button
                   type="button"
                   (click)="completeCurrentSession()"
-                  class="rounded-2xl border border-sage-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-sage-800 hover:bg-sage-50"
+                  class="inline-flex items-center gap-1.5 rounded-2xl border border-sage-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-sage-800 hover:bg-sage-50"
                 >
-                  ✓ Tamamla
+                  <app-icon name="check" sizeClass="h-3.5 w-3.5" />
+                  <span>Tamamla</span>
                 </button>
               </div>
             </div>
@@ -111,12 +124,16 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
             <!-- Sağ: Seans Detayları, Nefes Ritmi & Bölümler -->
             <div class="space-y-4">
               <div class="flex flex-wrap items-center gap-2">
-                <span class="rounded-full bg-sage-100 px-3 py-1 text-xs font-semibold text-sage-800">
-                  {{ categoryLabel(current.category) }}
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-3 py-1 text-xs font-semibold text-sage-800">
+                  <app-icon [name]="categoryIcon(current.category)" sizeClass="h-3.5 w-3.5" />
+                  <span>{{ categoryLabel(current.category) }}</span>
                 </span>
-                <span class="rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
-                  {{ current.mediaType === 'VIDEO' ? '🎬 Rehberli Video' : '🎧 Sesli Meditasyon' }} ·
-                  {{ current.durationMinutes }} dk
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
+                  <app-icon name="clock" sizeClass="h-3.5 w-3.5" />
+                  <span>
+                    {{ current.mediaType === 'VIDEO' ? 'Rehberli Video' : 'Sesli Meditasyon' }} ·
+                    {{ current.durationMinutes }} dk
+                  </span>
                 </span>
                 @if (current.recommendedPhase) {
                   <span class="rounded-full bg-cream-200 px-3 py-1 text-xs font-medium text-ink-700">
@@ -126,14 +143,15 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
               </div>
 
               <div>
-                <h2 class="text-xl font-bold text-ink-900">{{ current.title }}</h2>
-                <p class="mt-0.5 text-xs font-medium text-sage-700">{{ current.instructor }}</p>
+                <h2 class="text-2xl text-ink-900">{{ current.title }}</h2>
+                <p class="mt-0.5 text-xs font-semibold text-sage-700">{{ current.instructor }}</p>
                 <p class="mt-1.5 text-xs leading-relaxed text-ink-700">{{ current.subtitle }}</p>
               </div>
 
-              <div class="rounded-2xl border border-white/80 bg-white/80 p-3.5">
-                <p class="text-xs font-bold text-lavender-700">
-                  🌬️ Nefes Ritmi: {{ current.breathingPattern.label }}
+              <div class="rounded-2xl border border-white/80 bg-white/85 p-4">
+                <p class="inline-flex items-center gap-1.5 text-xs font-bold text-lavender-700">
+                  <app-icon name="breath" sizeClass="h-4 w-4" />
+                  <span>Nefes Ritmi: {{ current.breathingPattern.label }}</span>
                 </p>
                 <ul class="mt-2.5 space-y-1.5 text-xs text-ink-700">
                   @for (step of current.steps; track step) {
@@ -154,27 +172,29 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
         <button
           type="button"
           (click)="selectedCategory.set(undefined)"
-          class="rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
+          class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
           [class.border-sage-600]="selectedCategory() === undefined"
           [class.bg-sage-600]="selectedCategory() === undefined"
           [class.text-white]="selectedCategory() === undefined"
           [class.border-cream-300]="selectedCategory() !== undefined"
           [class.bg-cream-50]="selectedCategory() !== undefined"
         >
-          Tüm Seanslar
+          <app-icon name="lotus" sizeClass="h-3.5 w-3.5" />
+          <span>Tüm Seanslar</span>
         </button>
         @for (cat of categories; track cat.value) {
           <button
             type="button"
             (click)="selectedCategory.set(cat.value)"
-            class="rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
+            class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
             [class.border-sage-600]="selectedCategory() === cat.value"
             [class.bg-sage-600]="selectedCategory() === cat.value"
             [class.text-white]="selectedCategory() === cat.value"
             [class.border-cream-300]="selectedCategory() !== cat.value"
             [class.bg-cream-50]="selectedCategory() !== cat.value"
           >
-            {{ cat.label }}
+            <app-icon [name]="cat.icon" sizeClass="h-3.5 w-3.5" />
+            <span>{{ cat.label }}</span>
           </button>
         }
       </div>
@@ -189,13 +209,15 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
           >
             <div>
               <div class="flex items-center justify-between gap-2">
-                <span class="rounded-full bg-sage-100 px-3 py-1 text-xs font-semibold text-sage-800">
-                  {{ categoryLabel(session.category) }}
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-3 py-1 text-xs font-semibold text-sage-800">
+                  <app-icon [name]="categoryIcon(session.category)" sizeClass="h-3.5 w-3.5" />
+                  <span>{{ categoryLabel(session.category) }}</span>
                 </span>
                 <div class="flex items-center gap-1.5">
                   @if (sessionService.isCompleted(session.id)) {
-                    <span class="rounded-full bg-sage-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
-                      ✓ Tamamlandı
+                    <span class="inline-flex items-center gap-1 rounded-full bg-sage-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                      <app-icon name="check" sizeClass="h-3 w-3" />
+                      <span>Tamamlandı</span>
                     </span>
                   }
                   <span class="text-xs font-bold text-ink-500">{{ session.durationMinutes }} dk</span>
@@ -203,7 +225,7 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
               </div>
 
               <h3 class="mt-3 text-base font-bold text-ink-900">{{ session.title }}</h3>
-              <p class="mt-0.5 text-[11px] font-medium text-lavender-700">{{ session.instructor }}</p>
+              <p class="mt-0.5 text-[11px] font-semibold text-lavender-700">{{ session.instructor }}</p>
               <p class="mt-1.5 text-xs leading-relaxed text-ink-700">{{ session.subtitle }}</p>
             </div>
 
@@ -214,9 +236,10 @@ import { SessionService, WellnessSessionDetail } from '../../../../core/services
               <button
                 type="button"
                 (click)="selectSession(session)"
-                class="rounded-xl bg-sage-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-sage-600"
+                class="inline-flex items-center gap-1.5 rounded-xl bg-sage-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-sage-700"
               >
-                {{ activeSession()?.id === session.id ? 'Oynatıcıda Açık' : 'Oynatıcıda Başlat' }}
+                <app-icon name="play" sizeClass="h-3 w-3" />
+                <span>{{ activeSession()?.id === session.id ? 'Oynatıcıda Açık' : 'Oynatıcıda Başlat' }}</span>
               </button>
             </div>
           </article>
@@ -241,13 +264,17 @@ export class SessionListPage implements OnInit, OnDestroy {
   private audioCtx?: AudioContext;
   private oscillator?: OscillatorNode;
 
-  protected readonly categories: { value: SessionCategory; label: string }[] = [
-    { value: 'YOGA', label: '🧘‍♀️ Yoga' },
-    { value: 'PILATES', label: '🤸‍♀️ Pilates' },
-    { value: 'BREATHING', label: '🌬️ Nefes Koçu' },
-    { value: 'MEDITATION', label: '🕯️ Meditasyon' },
-    { value: 'WORKOUT', label: '💪 Kardiyo & Güç' },
-    { value: 'SLEEP', label: '🌙 Uyku & Yoga Nidra' },
+  protected readonly categories: {
+    value: SessionCategory;
+    label: string;
+    icon: WellnessIconName;
+  }[] = [
+    { value: 'YOGA', label: 'Yoga', icon: 'yoga' },
+    { value: 'PILATES', label: 'Pilates', icon: 'pilates' },
+    { value: 'BREATHING', label: 'Nefes Koçu', icon: 'breath' },
+    { value: 'MEDITATION', label: 'Meditasyon', icon: 'meditation' },
+    { value: 'WORKOUT', label: 'Kardiyo & Güç', icon: 'fitness' },
+    { value: 'SLEEP', label: 'Uyku & Yoga Nidra', icon: 'sleep' },
   ];
 
   protected readonly filteredSessions = computed(() => {
@@ -331,6 +358,10 @@ export class SessionListPage implements OnInit, OnDestroy {
     }
   }
 
+  protected categoryIcon(cat: SessionCategory): WellnessIconName {
+    return this.categories.find((c) => c.value === cat)?.icon ?? 'lotus';
+  }
+
   protected categoryLabel(cat: SessionCategory): string {
     return this.categories.find((c) => c.value === cat)?.label ?? cat;
   }
@@ -366,7 +397,6 @@ export class SessionListPage implements OnInit, OnDestroy {
     }
   }
 
-  /** Web Audio API ile sakinleştirici düşük volümlü 432/528 Hz ambient ton üretir */
   private startAmbientSound(frequencyHz: number): void {
     try {
       this.stopAmbientSound();

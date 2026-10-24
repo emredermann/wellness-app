@@ -2,46 +2,65 @@
 @import "leaflet/dist/leaflet.css";
 
 /*
- * Wellness renk paleti — sakinleştirici, düşük kontrastlı pastel tonlar.
- *  - sage     : soft pastel yeşil (birincil / marka)
- *  - cream    : krem (zemin, yüzeyler)
- *  - lavender : lavanta (vurgu / ikincil)
- *  - ink      : yumuşak, sıcak koyu ton (metin) — saf siyah yerine
+ * LunaWell Editorial FemTech & Cycle-Syncing Tema Sistemi
+ * İlham alınan uygulamalar: Wild AI, Flo, Clue, Alo Moves, MyFLO
+ *
+ *  - font-display : DM Serif Display (editorial zarif başlıklar)
+ *  - font-sans    : Plus Jakarta Sans (yüksek okunabilirlikli modern UI)
+ *  - sage         : Okaliptüs & soft adaçayı yeşili (Foliküler / Ana marka)
+ *  - cream        : Sıcak alabaster & organik keten kremi (#FAF7F2)
+ *  - lavender     : Sıcak lavanta & dusty rose-plum (Luteal / İkincil vurgu)
+ *  - terracotta   : Toprak & mürdüm-terracotta (Menstrüel faz)
+ *  - amber        : Altın şeftali & güneş kehribarı (Ovulasyon fazı)
+ *  - ink          : Saf siyah yerine sıcak espresso-taupe metin tonları
  */
 @theme {
-  --color-sage-50: #f3f8f4;
-  --color-sage-100: #e3efe6;
-  --color-sage-200: #c8e0ce;
-  --color-sage-300: #a5cbb0;
-  --color-sage-400: #7fb18f;
-  --color-sage-500: #5f9773;
-  --color-sage-600: #4a7a5c;
-  --color-sage-700: #3c614b;
-  --color-sage-800: #324e3e;
-  --color-sage-900: #2a4134;
+  --color-sage-50: #f3f7f4;
+  --color-sage-100: #e3ede6;
+  --color-sage-200: #c7ddd0;
+  --color-sage-300: #a1c5b0;
+  --color-sage-400: #76a68b;
+  --color-sage-500: #55896d;
+  --color-sage-600: #426e57;
+  --color-sage-700: #365947;
+  --color-sage-800: #2d483b;
+  --color-sage-900: #253b31;
 
-  --color-cream-50: #fffdf8;
-  --color-cream-100: #fdf8ee;
-  --color-cream-200: #f9f0dc;
-  --color-cream-300: #f3e4c3;
-  --color-cream-400: #e9d2a3;
-  --color-cream-500: #dcbd82;
+  --color-cream-50: #fdfbf8;
+  --color-cream-100: #f8f4ec;
+  --color-cream-200: #efe7d8;
+  --color-cream-300: #e3d5be;
+  --color-cream-400: #d2bc9b;
+  --color-cream-500: #bda078;
 
-  --color-lavender-50: #f8f6fc;
-  --color-lavender-100: #efeaf8;
-  --color-lavender-200: #e0d6f2;
-  --color-lavender-300: #c9b8e8;
-  --color-lavender-400: #ad94da;
-  --color-lavender-500: #9275c9;
-  --color-lavender-600: #7a5cb1;
-  --color-lavender-700: #644a91;
+  --color-lavender-50: #f8f5fb;
+  --color-lavender-100: #efe9f6;
+  --color-lavender-200: #dfd4ee;
+  --color-lavender-300: #c7b4e1;
+  --color-lavender-400: #a98DCF;
+  --color-lavender-500: #8d6cb8;
+  --color-lavender-600: #74539e;
+  --color-lavender-700: #5e4380;
 
-  --color-ink-400: #8a8579;
-  --color-ink-500: #6b665c;
-  --color-ink-700: #423e37;
-  --color-ink-900: #2b2823;
+  --color-terracotta-50: #fbf4f2;
+  --color-terracotta-100: #f5e5e1;
+  --color-terracotta-200: #eacbc3;
+  --color-terracotta-500: #b86556;
+  --color-terracotta-600: #9c4f42;
+  --color-terracotta-700: #7f3f34;
 
-  /* Geriye dönük uyumluluk: eski "brand" adlandırması sage'e eşlenir */
+  --color-amber-50: #fdf8ee;
+  --color-amber-100: #f9edd4;
+  --color-amber-200: #f2d8a7;
+  --color-amber-500: #d89535;
+  --color-amber-600: #b87822;
+  --color-amber-700: #925c19;
+
+  --color-ink-400: #8c8479;
+  --color-ink-500: #6b645B;
+  --color-ink-700: #3f3a34;
+  --color-ink-900: #231f1c;
+
   --color-brand-50: var(--color-sage-50);
   --color-brand-100: var(--color-sage-100);
   --color-brand-500: var(--color-sage-500);
@@ -49,17 +68,25 @@
   --color-brand-700: var(--color-sage-700);
   --color-calm-500: var(--color-lavender-500);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DM Serif Display", Georgia, serif;
 
   --radius-4xl: 2rem;
-  --shadow-soft: 0 8px 30px -12px rgb(74 122 92 / 0.18);
-  --shadow-nav: 0 -6px 24px -12px rgb(66 62 55 / 0.15);
+  --shadow-soft: 0 12px 36px -14px rgb(45 72 59 / 0.14), 0 4px 14px -6px rgb(35 31 28 / 0.06);
+  --shadow-nav: 0 -10px 32px -12px rgb(35 31 28 / 0.14);
 }
 
 @layer base {
   html,
   body {
-    @apply h-full bg-cream-100 text-ink-700 antialiased;
+    @apply h-full bg-cream-100 font-sans text-ink-700 antialiased;
+  }
+
+  h1,
+  h2,
+  .font-editorial {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
   }
 
   ::selection {
@@ -67,18 +94,21 @@
   }
 }
 
-/* Tekrar kullanılan form / buton yardımcıları */
 @layer components {
   .wl-card {
-    @apply rounded-3xl border border-cream-200 bg-cream-50 p-6 shadow-soft;
+    @apply rounded-3xl border border-cream-200/90 bg-cream-50/95 p-6 shadow-soft backdrop-blur-xs transition-all;
+  }
+
+  .wl-glass-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/80 px-3.5 py-1.5 text-xs font-semibold shadow-2xs backdrop-blur-md;
   }
 
   .wl-label {
-    @apply mb-1.5 block text-sm font-medium text-ink-700;
+    @apply mb-1.5 block text-xs font-semibold tracking-wide text-ink-700;
   }
 
   .wl-input {
-    @apply block w-full rounded-2xl border border-cream-300 bg-white/80 px-4 py-3 text-ink-900
+    @apply block w-full rounded-2xl border border-cream-300 bg-white/90 px-4 py-3 text-sm text-ink-900
       placeholder:text-ink-400 transition outline-none
       focus:border-sage-400 focus:ring-4 focus:ring-sage-100;
   }
@@ -88,13 +118,13 @@
   }
 
   .wl-error {
-    @apply mt-1.5 text-xs text-rose-500;
+    @apply mt-1.5 text-xs text-rose-600;
   }
 
   .wl-btn-primary {
-    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sage-500 px-5 py-3.5
-      font-semibold text-white shadow-soft transition
-      hover:bg-sage-600 focus-visible:ring-4 focus-visible:ring-sage-200 focus-visible:outline-none
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sage-600 px-5 py-3.5
+      text-sm font-semibold text-white shadow-soft transition
+      hover:bg-sage-700 focus-visible:ring-4 focus-visible:ring-sage-200 focus-visible:outline-none
       disabled:cursor-not-allowed disabled:opacity-60;
   }
 

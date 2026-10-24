@@ -7,56 +7,60 @@ import {
   RecipeDetail,
   RecipeService,
 } from '../../../../core/services/recipe.service';
+import { WellnessIconComponent } from '../../../../shared/components/icon/wellness-icon.component';
 
 type NutritionTab = 'recipes' | 'shopping' | 'vision';
 
 @Component({
   selector: 'app-recipe-list',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, WellnessIconComponent],
   template: `
     <div class="space-y-6">
       <!-- Üst Başlık, Sekmeler & Kalori Gizleme Toggle -->
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p class="text-xs font-medium tracking-wide text-lavender-700 uppercase">
-            Modül 3 · Döngü Fazı & Diyet Uyumlu Beslenme
+          <p class="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-lavender-700 uppercase">
+            <app-icon name="bowl" sizeClass="h-3.5 w-3.5" />
+            <span>Döngü Fazı & Diyet Uyumlu Beslenme</span>
           </p>
-          <h1 class="text-2xl font-bold text-ink-900">Tarifler, Alışveriş Listesi & AI Tabak Analizi</h1>
+          <h1 class="mt-1 text-3xl text-ink-900">Tarifler, Alışveriş Listesi & AI Tabak Analizi</h1>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <!-- Sekme Geçişleri -->
           <div class="inline-flex rounded-2xl border border-cream-300 bg-cream-50 p-1">
             <button
               type="button"
               (click)="activeTab.set('recipes')"
-              class="rounded-xl px-3.5 py-2 text-xs font-semibold transition"
-              [class.bg-sage-500]="activeTab() === 'recipes'"
+              class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+              [class.bg-sage-600]="activeTab() === 'recipes'"
               [class.text-white]="activeTab() === 'recipes'"
               [class.text-ink-700]="activeTab() !== 'recipes'"
             >
-              🥗 Tarifler ({{ filteredRecipes().length }})
+              <app-icon name="bowl" sizeClass="h-3.5 w-3.5" />
+              <span>Tarifler ({{ filteredRecipes().length }})</span>
             </button>
             <button
               type="button"
               (click)="activeTab.set('shopping')"
-              class="rounded-xl px-3.5 py-2 text-xs font-semibold transition"
-              [class.bg-sage-500]="activeTab() === 'shopping'"
+              class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+              [class.bg-sage-600]="activeTab() === 'shopping'"
               [class.text-white]="activeTab() === 'shopping'"
               [class.text-ink-700]="activeTab() !== 'shopping'"
             >
-              🛒 Alışveriş Listem ({{ recipeService.uncheckedShoppingCount() }})
+              <app-icon name="bag" sizeClass="h-3.5 w-3.5" />
+              <span>Alışveriş Listem ({{ recipeService.uncheckedShoppingCount() }})</span>
             </button>
             <button
               type="button"
               (click)="activeTab.set('vision')"
-              class="rounded-xl px-3.5 py-2 text-xs font-semibold transition"
-              [class.bg-sage-500]="activeTab() === 'vision'"
+              class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+              [class.bg-sage-600]="activeTab() === 'vision'"
               [class.text-white]="activeTab() === 'vision'"
               [class.text-ink-700]="activeTab() !== 'vision'"
             >
-              📸 AI Tabak Analizi
+              <app-icon name="camera" sizeClass="h-3.5 w-3.5" />
+              <span>AI Tabak Analizi</span>
             </button>
           </div>
 
@@ -71,14 +75,14 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
       </div>
 
       @if (toastMessage()) {
-        <div class="rounded-2xl border border-sage-300 bg-sage-50 px-4 py-3 text-xs font-semibold text-sage-800">
-          ✓ {{ toastMessage() }}
+        <div class="flex items-center gap-2 rounded-2xl border border-sage-300 bg-sage-50 px-4 py-3 text-xs font-semibold text-sage-800">
+          <app-icon name="check" sizeClass="h-4 w-4 text-sage-600" />
+          <span>{{ toastMessage() }}</span>
         </div>
       }
 
       <!-- SEKME 1: TARİFLER VE FİLTRELEME -->
       @if (activeTab() === 'recipes') {
-        <!-- Filtre Çubuğu -->
         <section class="wl-card space-y-4">
           <div class="grid gap-3 md:grid-cols-3">
             <div>
@@ -95,10 +99,10 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
               <label class="wl-label">Diyet Tipi</label>
               <select [(ngModel)]="selectedDiet" class="wl-input py-2.5 text-xs">
                 <option [ngValue]="undefined">Tüm Diyet Tipleri</option>
-                <option value="VEGAN">🌱 Vegan</option>
-                <option value="VEGETARIAN">🥗 Vejetaryen</option>
-                <option value="PESCATARIAN">🐟 Pesketaryen</option>
-                <option value="REGULAR">🍲 Normal</option>
+                <option value="VEGAN">Vegan</option>
+                <option value="VEGETARIAN">Vejetaryen</option>
+                <option value="PESCATARIAN">Pesketaryen</option>
+                <option value="REGULAR">Normal</option>
               </select>
             </div>
 
@@ -127,9 +131,10 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
             <button
               type="button"
               (click)="applyUserCycleAndDiet()"
-              class="text-xs font-semibold text-lavender-700 hover:underline"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold text-lavender-700 hover:underline"
             >
-              ✨ Mevcut Fazıma ({{ profileService.cycleSnapshot().phaseLabel }}) Uygun Olanları Seç
+              <app-icon name="sparkle" sizeClass="h-3.5 w-3.5" />
+              <span>Mevcut Fazıma ({{ profileService.cycleSnapshot().phaseLabel }}) Uygun Olanları Seç</span>
             </button>
           </div>
         </section>
@@ -141,8 +146,9 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
               <div>
                 <div class="flex items-center justify-between gap-2">
                   <div class="flex items-center gap-1.5">
-                    <span class="rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
-                      {{ r.dietType }}
+                    <span class="inline-flex items-center gap-1 rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
+                      <app-icon name="leaf" sizeClass="h-3 w-3" />
+                      <span>{{ r.dietType }}</span>
                     </span>
                     @if (r.turkishCuisine) {
                       <span class="rounded-full bg-cream-200 px-2.5 py-0.5 text-[11px] font-medium text-ink-700">
@@ -153,14 +159,16 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
                   @if (!profileService.hideCalories()) {
                     <span class="text-xs font-bold text-sage-700">{{ r.calories }} kcal</span>
                   } @else {
-                    <span class="text-[11px] font-medium text-ink-400">⏱ {{ r.prepMinutes }} dk</span>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-ink-400">
+                      <app-icon name="clock" sizeClass="h-3 w-3" />
+                      <span>{{ r.prepMinutes }} dk</span>
+                    </span>
                   }
                 </div>
 
-                <h2 class="mt-3 text-base font-bold text-ink-900">{{ r.title }}</h2>
+                <h2 class="mt-3 text-xl text-ink-900">{{ r.title }}</h2>
                 <p class="mt-1 text-xs leading-relaxed text-ink-700">{{ r.description }}</p>
 
-                <!-- Makro Özeti (Kalori görünürse) -->
                 @if (!profileService.hideCalories()) {
                   <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
                     <span class="rounded-lg bg-white px-2.5 py-1 font-medium text-ink-700">
@@ -172,8 +180,9 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
                     <span class="rounded-lg bg-white px-2.5 py-1 font-medium text-ink-700">
                       Yağ: <strong>{{ r.fat }}g</strong>
                     </span>
-                    <span class="rounded-lg bg-white px-2.5 py-1 font-medium text-ink-500">
-                      ⏱ {{ r.prepMinutes }} dk
+                    <span class="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1 font-medium text-ink-500">
+                      <app-icon name="clock" sizeClass="h-3 w-3" />
+                      <span>{{ r.prepMinutes }} dk</span>
                     </span>
                   </div>
                 }
@@ -198,16 +207,17 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
                   <button
                     type="button"
                     (click)="selectedRecipeModal.set(r)"
-                    class="flex-1 rounded-xl bg-sage-500 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-sage-600"
+                    class="flex-1 rounded-xl bg-sage-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-sage-700"
                   >
                     Tarif Detayı & Hazırlanışı
                   </button>
                   <button
                     type="button"
                     (click)="addRecipeToShoppingList(r)"
-                    class="rounded-xl border border-lavender-300 bg-lavender-50 px-3.5 py-2 text-xs font-semibold text-lavender-700 transition hover:bg-lavender-100"
+                    class="inline-flex items-center gap-1 rounded-xl border border-lavender-300 bg-lavender-50 px-3.5 py-2 text-xs font-semibold text-lavender-700 transition hover:bg-lavender-100"
                   >
-                    + Listeye Ekle
+                    <app-icon name="plus" sizeClass="h-3.5 w-3.5" />
+                    <span>Listeye Ekle</span>
                   </button>
                 </div>
               </div>
@@ -221,7 +231,7 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
         <section class="wl-card space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 class="text-base font-bold text-ink-900">Haftalık Wellness Alışveriş Listem</h2>
+              <h2 class="text-xl text-ink-900">Haftalık Wellness Alışveriş Listem</h2>
               <p class="text-xs text-ink-500">
                 Tariflerden eklediğin malzemeler otomatik birleştirilir
               </p>
@@ -231,9 +241,10 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
               <button
                 type="button"
                 (click)="recipeService.clearCompletedShoppingItems()"
-                class="rounded-xl border border-cream-300 bg-white px-3 py-1.5 text-xs font-semibold text-ink-700 hover:border-rose-300 hover:text-rose-700"
+                class="inline-flex items-center gap-1.5 rounded-xl border border-cream-300 bg-white px-3 py-1.5 text-xs font-semibold text-ink-700 hover:border-terracotta-200 hover:text-terracotta-700"
               >
-                İşaretlenenleri Temizle
+                <app-icon name="trash" sizeClass="h-3.5 w-3.5" />
+                <span>İşaretlenenleri Temizle</span>
               </button>
             }
           </div>
@@ -242,7 +253,7 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
             <div class="rounded-2xl border border-dashed border-cream-300 bg-white/60 p-8 text-center">
               <p class="text-sm font-semibold text-ink-700">Alışveriş listen henüz boş</p>
               <p class="mt-1 text-xs text-ink-500">
-                Tarif kartlarındaki <strong>"+ Listeye Ekle"</strong> butonuna tıklayarak malzemeleri
+                Tarif kartlarındaki <strong>"Listeye Ekle"</strong> butonuna tıklayarak malzemeleri
                 buraya aktarabilirsin.
               </p>
             </div>
@@ -272,9 +283,10 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
                   <button
                     type="button"
                     (click)="recipeService.removeShoppingItem(item.id)"
-                    class="text-xs text-ink-400 hover:text-rose-600"
+                    class="inline-flex items-center gap-1 text-xs text-ink-400 hover:text-terracotta-600"
                   >
-                    Sil
+                    <app-icon name="trash" sizeClass="h-3.5 w-3.5" />
+                    <span>Sil</span>
                   </button>
                 </div>
               }
@@ -283,14 +295,15 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
         </section>
       }
 
-      <!-- SEKME 3: AI TABAK / FOTOĞRAF ANALİZİ (Backend /api/recipes/photo-analyze-mock) -->
+      <!-- SEKME 3: AI TABAK / FOTOĞRAF ANALİZİ -->
       @if (activeTab() === 'vision') {
         <section class="wl-card space-y-5">
           <div>
-            <span class="rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
-              AI Vision Beslenme Asistanı
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
+              <app-icon name="camera" sizeClass="h-3.5 w-3.5" />
+              <span>AI Vision Beslenme Asistanı</span>
             </span>
-            <h2 class="mt-2 text-lg font-bold text-ink-900">
+            <h2 class="mt-2 text-2xl text-ink-900">
               Tabak Fotoğrafı veya Öğün İçeriği Analizi
             </h2>
             <p class="mt-1 text-xs text-ink-500">
@@ -316,43 +329,47 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
               (click)="runPhotoAnalysis()"
               class="wl-btn-primary sm:w-auto"
             >
-              📸 Tabağı Analiz Et
+              <app-icon name="camera" sizeClass="h-4 w-4" />
+              <span>Tabağı Analiz Et</span>
             </button>
           </div>
 
-          <div class="flex flex-wrap gap-2 text-xs">
+          <div class="flex flex-wrap items-center gap-2 text-xs">
             <span class="text-ink-400">Hızlı Test Tabakları:</span>
             <button
               type="button"
               (click)="visionMealHint = 'Mercimek ve Kinoa Kasesi'; runPhotoAnalysis()"
-              class="rounded-full bg-cream-200 px-3 py-1 font-medium text-ink-700 hover:bg-sage-100"
+              class="inline-flex items-center gap-1.5 rounded-full bg-cream-200 px-3 py-1 font-medium text-ink-700 hover:bg-sage-100"
             >
-              🥣 Mercimek & Kinoa
+              <app-icon name="bowl" sizeClass="h-3.5 w-3.5 text-sage-700" />
+              <span>Mercimek & Kinoa</span>
             </button>
             <button
               type="button"
               (click)="visionMealHint = 'Izgara Somon ve Rezene Salatası'; runPhotoAnalysis()"
-              class="rounded-full bg-cream-200 px-3 py-1 font-medium text-ink-700 hover:bg-sage-100"
+              class="inline-flex items-center gap-1.5 rounded-full bg-cream-200 px-3 py-1 font-medium text-ink-700 hover:bg-sage-100"
             >
-              🐟 Izgara Somon
+              <app-icon name="fish" sizeClass="h-3.5 w-3.5 text-lavender-700" />
+              <span>Izgara Somon</span>
             </button>
             <button
               type="button"
               (click)="visionMealHint = 'Zeytinyağlı Çanak Enginar'; runPhotoAnalysis()"
-              class="rounded-full bg-cream-200 px-3 py-1 font-medium text-ink-700 hover:bg-sage-100"
+              class="inline-flex items-center gap-1.5 rounded-full bg-cream-200 px-3 py-1 font-medium text-ink-700 hover:bg-sage-100"
             >
-              🌿 Zeytinyağlı Enginar
+              <app-icon name="leaf" sizeClass="h-3.5 w-3.5 text-sage-700" />
+              <span>Zeytinyağlı Enginar</span>
             </button>
           </div>
 
           @if (visionResult(); as res) {
-            <div class="rounded-2xl border border-sage-200 bg-sage-50/70 p-5 space-y-4">
+            <div class="space-y-4 rounded-2xl border border-sage-200 bg-sage-50/70 p-5">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <span class="text-[11px] font-semibold text-sage-700 uppercase">
                     Tespit Edilen Tabak
                   </span>
-                  <h3 class="text-base font-bold text-ink-900">{{ res.detectedDishName }}</h3>
+                  <h3 class="text-xl text-ink-900">{{ res.detectedDishName }}</h3>
                 </div>
 
                 @if (!profileService.hideCalories()) {
@@ -362,8 +379,9 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
                 }
               </div>
 
-              <p class="text-xs leading-relaxed text-ink-700">
-                💡 <strong>Diyetisyen & Hormon Notu:</strong> {{ res.nutritionistNote }}
+              <p class="flex items-start gap-2 text-xs leading-relaxed text-ink-700">
+                <app-icon name="sparkle" sizeClass="mt-0.5 h-4 w-4 shrink-0 text-lavender-600" />
+                <span><strong>Diyetisyen & Hormon Notu:</strong> {{ res.nutritionistNote }}</span>
               </p>
 
               <div class="grid gap-2 sm:grid-cols-3">
@@ -392,30 +410,30 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
             (click)="$event.stopPropagation()"
           >
             <div class="flex items-start justify-between gap-3">
-              <span class="rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
-                {{ modalRecipe.dietType }} · ⏱ {{ modalRecipe.prepMinutes }} dk
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-lavender-100 px-3 py-1 text-xs font-semibold text-lavender-700">
+                <app-icon name="clock" sizeClass="h-3.5 w-3.5" />
+                <span>{{ modalRecipe.dietType }} · {{ modalRecipe.prepMinutes }} dk</span>
               </span>
               <button
                 type="button"
                 (click)="selectedRecipeModal.set(null)"
-                class="flex h-8 w-8 items-center justify-center rounded-full border border-cream-300 bg-white text-sm text-ink-500"
+                class="flex h-8 w-8 items-center justify-center rounded-full border border-cream-300 bg-white text-ink-500"
               >
-                ✕
+                <app-icon name="close" sizeClass="h-4 w-4" />
               </button>
             </div>
 
-            <h2 class="mt-3 text-xl font-bold text-ink-900">{{ modalRecipe.title }}</h2>
+            <h2 class="mt-3 text-2xl text-ink-900">{{ modalRecipe.title }}</h2>
             <p class="mt-1 text-xs leading-relaxed text-ink-700">{{ modalRecipe.description }}</p>
 
-            <!-- Hormonal Fayda Kutusu -->
-            <div class="mt-4 rounded-2xl border border-sage-200 bg-sage-50 p-3.5 text-xs text-sage-900">
-              🌿 <strong>Döngü & Hormon Desteği:</strong> {{ modalRecipe.hormoneBenefitNote }}
+            <div class="mt-4 flex items-start gap-2 rounded-2xl border border-sage-200 bg-sage-50 p-3.5 text-xs text-sage-900">
+              <app-icon name="sprout" sizeClass="mt-0.5 h-4 w-4 shrink-0 text-sage-700" />
+              <span><strong>Döngü & Hormon Desteği:</strong> {{ modalRecipe.hormoneBenefitNote }}</span>
             </div>
 
-            <!-- Malzeme Listesi -->
             <div class="mt-4">
               <h3 class="text-xs font-bold tracking-wide text-ink-500 uppercase">Malzemeler</h3>
-              <ul class="mt-2 grid gap-1.5 sm:grid-cols-2 text-xs text-ink-900">
+              <ul class="mt-2 grid gap-1.5 text-xs text-ink-900 sm:grid-cols-2">
                 @for (ing of modalRecipe.ingredients; track ing.name) {
                   <li class="rounded-xl border border-cream-200 bg-white px-3 py-2">
                     <strong>{{ ing.amount }} {{ ing.unit }}</strong> {{ ing.name }}
@@ -424,7 +442,6 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
               </ul>
             </div>
 
-            <!-- Adım Adım Hazırlanışı -->
             <div class="mt-4">
               <h3 class="text-xs font-bold tracking-wide text-ink-500 uppercase">
                 Adım Adım Hazırlanışı
@@ -432,7 +449,7 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
               <ol class="mt-2 space-y-2 text-xs leading-relaxed text-ink-700">
                 @for (step of modalRecipe.steps; track step; let idx = $index) {
                   <li class="flex gap-2.5 rounded-xl bg-white p-3">
-                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sage-500 text-[11px] font-bold text-white">
+                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sage-600 text-[11px] font-bold text-white">
                       {{ idx + 1 }}
                     </span>
                     <span>{{ step }}</span>
@@ -447,7 +464,8 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
                 (click)="addRecipeToShoppingList(modalRecipe); selectedRecipeModal.set(null)"
                 class="wl-btn-primary"
               >
-                🛒 Tüm Malzemeleri Alışveriş Listeme Ekle
+                <app-icon name="bag" sizeClass="h-4 w-4" />
+                <span>Tüm Malzemeleri Alışveriş Listeme Ekle</span>
               </button>
             </div>
           </div>
