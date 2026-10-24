@@ -27,12 +27,12 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
           <h1 class="mt-1 text-3xl text-ink-900">Tarifler, Alışveriş Listesi & AI Tabak Analizi</h1>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2">
-          <div class="inline-flex rounded-2xl border border-cream-300 bg-cream-50 p-1">
+        <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+          <div class="no-scrollbar flex w-full overflow-x-auto rounded-2xl border border-cream-300 bg-cream-50 p-1 sm:w-auto sm:inline-flex">
             <button
               type="button"
               (click)="activeTab.set('recipes')"
-              class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+              class="inline-flex min-h-10 flex-1 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition sm:flex-initial"
               [class.bg-sage-600]="activeTab() === 'recipes'"
               [class.text-white]="activeTab() === 'recipes'"
               [class.text-ink-700]="activeTab() !== 'recipes'"
@@ -43,31 +43,31 @@ type NutritionTab = 'recipes' | 'shopping' | 'vision';
             <button
               type="button"
               (click)="activeTab.set('shopping')"
-              class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+              class="inline-flex min-h-10 flex-1 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition sm:flex-initial"
               [class.bg-sage-600]="activeTab() === 'shopping'"
               [class.text-white]="activeTab() === 'shopping'"
               [class.text-ink-700]="activeTab() !== 'shopping'"
             >
               <app-icon name="bag" sizeClass="h-3.5 w-3.5" />
-              <span>Alışveriş Listem ({{ recipeService.uncheckedShoppingCount() }})</span>
+              <span>Alışveriş ({{ recipeService.uncheckedShoppingCount() }})</span>
             </button>
             <button
               type="button"
               (click)="activeTab.set('vision')"
-              class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+              class="inline-flex min-h-10 flex-1 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition sm:flex-initial"
               [class.bg-sage-600]="activeTab() === 'vision'"
               [class.text-white]="activeTab() === 'vision'"
               [class.text-ink-700]="activeTab() !== 'vision'"
             >
               <app-icon name="camera" sizeClass="h-3.5 w-3.5" />
-              <span>AI Tabak Analizi</span>
+              <span>AI Analiz</span>
             </button>
           </div>
 
           <button
             type="button"
             (click)="profileService.toggleCaloriesVisibility()"
-            class="rounded-2xl border border-cream-300 bg-cream-50 px-3.5 py-2 text-xs font-semibold text-ink-700 hover:border-lavender-300"
+            class="min-h-10 w-full rounded-2xl border border-cream-300 bg-cream-50 px-3.5 py-2 text-xs font-semibold text-ink-700 hover:border-lavender-300 sm:w-auto"
           >
             {{ profileService.hideCalories() ? 'Kaloriler Gizli' : 'Kalorileri Gizle' }}
           </button>

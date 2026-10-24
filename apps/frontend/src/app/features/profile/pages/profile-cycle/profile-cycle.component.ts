@@ -36,11 +36,11 @@ interface CalendarDayCell {
           <p class="text-xs text-ink-500">{{ profileService.profile().email }}</p>
         </div>
 
-        <div class="inline-flex rounded-2xl border border-cream-300 bg-cream-50 p-1">
+        <div class="no-scrollbar flex w-full overflow-x-auto rounded-2xl border border-cream-300 bg-cream-50 p-1 sm:w-auto sm:inline-flex">
           <button
             type="button"
             (click)="activeTab.set('cycle')"
-            class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+            class="inline-flex min-h-10 flex-1 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition sm:flex-initial"
             [class.bg-sage-600]="activeTab() === 'cycle'"
             [class.text-white]="activeTab() === 'cycle'"
             [class.text-ink-700]="activeTab() !== 'cycle'"
@@ -51,7 +51,7 @@ interface CalendarDayCell {
           <button
             type="button"
             (click)="activeTab.set('preferences')"
-            class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+            class="inline-flex min-h-10 flex-1 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition sm:flex-initial"
             [class.bg-sage-600]="activeTab() === 'preferences'"
             [class.text-white]="activeTab() === 'preferences'"
             [class.text-ink-700]="activeTab() !== 'preferences'"
@@ -62,7 +62,7 @@ interface CalendarDayCell {
           <button
             type="button"
             (click)="activeTab.set('kvkk')"
-            class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition"
+            class="inline-flex min-h-10 flex-1 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition sm:flex-initial"
             [class.bg-sage-600]="activeTab() === 'kvkk'"
             [class.text-white]="activeTab() === 'kvkk'"
             [class.text-ink-700]="activeTab() !== 'kvkk'"

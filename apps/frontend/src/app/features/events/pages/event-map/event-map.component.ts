@@ -3,6 +3,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   OnDestroy,
   ViewChild,
   effect,
@@ -30,32 +31,32 @@ interface CategoryFilterOption {
   standalone: true,
   imports: [DatePipe, RouterLink, EventDetailModalComponent, WellnessIconComponent],
   template: `
-    <div class="relative flex h-[calc(100vh-9.5rem)] min-h-[540px] w-full flex-col overflow-hidden rounded-3xl border border-cream-300 bg-cream-50 shadow-soft">
-      <!-- Üst Yüzen Filtre Barı & İşletme Paneli Geçişi -->
-      <div class="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col gap-2.5 p-3 sm:p-4">
-        <div class="pointer-events-auto flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-cream-200/90 bg-cream-50/95 px-4 py-2.5 shadow-soft backdrop-blur-md">
+    <div class="space-y-4">
+      <!-- Üst Kontrol ve Branş Filtre Çubuğu (Hem Mobil Hem PC Uyumlu) -->
+      <div class="wl-card !p-3.5 sm:!p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2.5">
           <div>
             <span class="inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider text-sage-700 uppercase">
               <app-icon name="compass" sizeClass="h-3.5 w-3.5" />
               <span>Yerel Etkinlik Haritası</span>
             </span>
-            <h1 class="text-base text-ink-900 sm:text-lg">
-              Açık Hava & Stüdyo Buluşmaları ({{ eventService.events().length }} Nokta)
+            <h1 class="text-xl text-ink-900 sm:text-2xl">
+              Açık Hava & Stüdyo Buluşmaları ({{ eventService.events().length }})
             </h1>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <button
               type="button"
               (click)="locateUser()"
-              class="inline-flex items-center gap-1.5 rounded-xl border border-sage-300 bg-white px-3 py-1.5 text-xs font-semibold text-sage-800 transition hover:bg-sage-50"
+              class="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-sage-300 bg-white px-3 py-2 text-xs font-semibold text-sage-800 transition hover:bg-sage-50 active:scale-95"
             >
               <app-icon name="map-pin" sizeClass="h-3.5 w-3.5 text-sage-600" />
               <span>Konumuma Git</span>
             </button>
             <a
               routerLink="/app/map/organizer"
-              class="inline-flex items-center gap-1.5 rounded-xl bg-lavender-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-lavender-700"
+              class="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-lavender-600 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition hover:bg-lavender-700 active:scale-95"
             >
               <app-icon name="plus" sizeClass="h-3.5 w-3.5" />
               <span>Kulüp / Etkinlik Ekle</span>
@@ -63,18 +64,18 @@ interface CategoryFilterOption {
           </div>
         </div>
 
-        <!-- Spor Branşlarına Göre Filtreleme Butonları (SVG İkonlarla) -->
-        <div class="pointer-events-auto flex items-center gap-1.5 overflow-x-auto pb-1">
+        <!-- Spor Branşlarına Göre Yatay Kaydırılabilir Filtre Butonları -->
+        <div class="no-scrollbar mt-3 flex items-center gap-1.5 overflow-x-auto pb-0.5">
           @for (item of categoryFilters; track item.label) {
             <button
               type="button"
               (click)="selectCategory(item.value)"
-              class="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold shadow-2xs transition"
+              class="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition active:scale-95"
               [class.border-sage-600]="selectedCategory() === item.value"
               [class.bg-sage-600]="selectedCategory() === item.value"
               [class.text-white]="selectedCategory() === item.value"
               [class.border-cream-300]="selectedCategory() !== item.value"
-              [class.bg-cream-50/95]="selectedCategory() !== item.value"
+              [class.bg-white]="selectedCategory() !== item.value"
               [class.text-ink-700]="selectedCategory() !== item.value"
             >
               <app-icon [name]="item.icon" sizeClass="h-3.5 w-3.5" />
@@ -84,74 +85,81 @@ interface CategoryFilterOption {
         </div>
       </div>
 
-      <!-- Tam Ekran Leaflet Harita Konteyneri -->
-      <div #mapContainer class="z-10 h-full w-full flex-1"></div>
-
-      <!-- Pin Tıklandığında Alt Tarafta Açılan (Bottom Sheet) Etkinlik Detay Kartı -->
-      @if (selectedEvent(); as ev) {
-        <section
-          aria-label="Seçili Etkinlik Özeti"
-          class="z-20 border-t border-cream-300 bg-cream-50/98 p-4 shadow-nav backdrop-blur-md transition-all sm:p-5"
+      <!-- =========================================================================
+           ANA HARİTA & ETKİNLİK LİSTESİ BÖLÜMÜ
+           - Mobil: Tam genişlik harita + Altta açılır Bottom Sheet kartı
+           - PC (xl): Sol tarafta etkileşimli harita + Sağda kaydırılabilir liste
+           ========================================================================= -->
+      <div class="grid gap-4 xl:grid-cols-[1.45fr_1fr]">
+        <!-- Harita + Mobil/Tablet Bottom Sheet Konteyneri -->
+        <div
+          class="relative flex h-[64dvh] min-h-[420px] w-full flex-col overflow-hidden rounded-2xl border border-cream-300 bg-cream-50 shadow-soft sm:rounded-3xl xl:h-[680px]"
         >
-          <div class="mx-auto max-w-3xl">
-            <div class="mb-2 flex items-center justify-between">
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-2.5 py-0.5 text-xs font-semibold text-sage-800">
-                  <app-icon [name]="categoryIcon(ev.category)" sizeClass="h-3.5 w-3.5" />
-                  <span>{{ categoryLabel(ev.category) }}</span>
-                </span>
-                <span
-                  class="rounded-full px-2.5 py-0.5 text-xs font-bold"
-                  [class.bg-lavender-100]="ev.isFree"
-                  [class.text-lavender-700]="ev.isFree"
-                  [class.bg-cream-200]="!ev.isFree"
-                  [class.text-ink-900]="!ev.isFree"
-                >
-                  {{ ev.isFree ? 'Ücretsiz' : ev.price + ' ₺' }}
-                </span>
-                @if (eventService.getBookingForEvent(ev.id); as booking) {
-                  <span class="inline-flex items-center gap-1 rounded-full bg-sage-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
-                    <app-icon name="check" sizeClass="h-3 w-3" />
-                    <span>Kayıtlısın ({{ booking.qrCode }})</span>
-                  </span>
-                }
-              </div>
+          <div #mapContainer class="z-10 h-full w-full flex-1"></div>
 
-              <button
-                type="button"
-                (click)="selectedEvent.set(null)"
-                class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-ink-400 hover:text-ink-900"
-              >
-                <span>Kapat</span>
-                <app-icon name="close" sizeClass="h-3.5 w-3.5" />
-              </button>
-            </div>
-
-            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <div>
-                <h2 class="text-lg text-ink-900 sm:text-xl">{{ ev.title }}</h2>
-                <p class="mt-0.5 line-clamp-2 text-xs text-ink-700">{{ ev.description }}</p>
-                <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-500">
-                  <span class="inline-flex items-center gap-1">
-                    <app-icon name="calendar" sizeClass="h-3.5 w-3.5 text-sage-600" />
-                    <span>{{ ev.date | date: 'dd MMM yyyy · HH:mm' }}</span>
+          <!-- Pin Tıklandığında Alt Tarafta Açılan (Bottom Sheet) Etkinlik Detay Kartı -->
+          @if (selectedEvent(); as ev) {
+            <section
+              aria-label="Seçili Etkinlik Özeti"
+              class="z-20 border-t border-cream-300 bg-cream-50/98 p-3.5 shadow-nav backdrop-blur-md transition-all sm:p-5"
+            >
+              <div class="mb-2 flex items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="inline-flex items-center gap-1 rounded-full bg-sage-100 px-2.5 py-0.5 text-xs font-semibold text-sage-800">
+                    <app-icon [name]="categoryIcon(ev.category)" sizeClass="h-3.5 w-3.5" />
+                    <span>{{ categoryLabel(ev.category) }}</span>
                   </span>
-                  <span class="inline-flex items-center gap-1">
-                    <app-icon name="users" sizeClass="h-3.5 w-3.5 text-lavender-600" />
-                    <span>Kontenjan: {{ ev.capacity }} kişi</span>
+                  <span
+                    class="rounded-full px-2.5 py-0.5 text-xs font-bold"
+                    [class.bg-lavender-100]="ev.isFree"
+                    [class.text-lavender-700]="ev.isFree"
+                    [class.bg-cream-200]="!ev.isFree"
+                    [class.text-ink-900]="!ev.isFree"
+                  >
+                    {{ ev.isFree ? 'Ücretsiz' : ev.price + ' ₺' }}
                   </span>
-                  <span class="inline-flex items-center gap-1">
-                    <app-icon name="map-pin" sizeClass="h-3.5 w-3.5 text-sage-600" />
-                    <span>{{ ev.address }}</span>
-                  </span>
+                  @if (eventService.getBookingForEvent(ev.id); as booking) {
+                    <span class="inline-flex items-center gap-1 rounded-full bg-sage-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                      <app-icon name="check" sizeClass="h-3 w-3" />
+                      <span>Kayıtlısın ({{ booking.qrCode }})</span>
+                    </span>
+                  }
                 </div>
+
+                <button
+                  type="button"
+                  (click)="selectedEvent.set(null)"
+                  class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-ink-400 hover:text-ink-900"
+                >
+                  <span>Gizle</span>
+                  <app-icon name="close" sizeClass="h-3.5 w-3.5" />
+                </button>
               </div>
 
-              <div class="flex shrink-0 items-center gap-2">
+              <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                <div class="min-w-0">
+                  <h2 class="truncate text-base text-ink-900 sm:text-xl">{{ ev.title }}</h2>
+                  <p class="mt-0.5 line-clamp-2 text-xs text-ink-700">{{ ev.description }}</p>
+                  <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-500">
+                    <span class="inline-flex items-center gap-1">
+                      <app-icon name="calendar" sizeClass="h-3.5 w-3.5 text-sage-600" />
+                      <span>{{ ev.date | date: 'dd MMM · HH:mm' }}</span>
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                      <app-icon name="users" sizeClass="h-3.5 w-3.5 text-lavender-600" />
+                      <span>{{ ev.capacity }} kişi</span>
+                    </span>
+                    <span class="inline-flex items-center gap-1 truncate">
+                      <app-icon name="map-pin" sizeClass="h-3.5 w-3.5 shrink-0 text-sage-600" />
+                      <span class="truncate">{{ ev.address }}</span>
+                    </span>
+                  </div>
+                </div>
+
                 <button
                   type="button"
                   (click)="openBookingModal(ev)"
-                  class="inline-flex items-center gap-1.5 rounded-2xl bg-sage-600 px-4 py-2.5 text-xs font-semibold text-white shadow-soft transition hover:bg-sage-700"
+                  class="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-sage-600 px-4 py-2.5 text-xs font-semibold text-white shadow-soft transition hover:bg-sage-700 sm:w-auto"
                 >
                   <app-icon name="qr" sizeClass="h-4 w-4" />
                   <span>
@@ -163,10 +171,56 @@ interface CategoryFilterOption {
                   </span>
                 </button>
               </div>
-            </div>
+            </section>
+          }
+        </div>
+
+        <!-- Sağ/Alt Liste: Tüm Cihazlarda Harita Pinlerine Alternatif Hızlı Etkinlik Kartları -->
+        <aside class="space-y-3 xl:max-h-[680px] xl:overflow-y-auto xl:pr-1">
+          <div class="flex items-center justify-between px-1">
+            <h2 class="text-base text-ink-900">Etkinlik Listesi</h2>
+            <span class="text-xs text-ink-400">Haritada odaklamak için karta dokun</span>
           </div>
-        </section>
-      }
+
+          @for (ev of eventService.events(); track ev.id) {
+            <article
+              (click)="focusEventOnMap(ev)"
+              class="wl-card cursor-pointer !p-4 transition hover:border-sage-400"
+              [class.ring-2]="selectedEvent()?.id === ev.id"
+              [class.ring-sage-600]="selectedEvent()?.id === ev.id"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <span class="inline-flex items-center gap-1 rounded-full bg-sage-100 px-2.5 py-0.5 text-[11px] font-semibold text-sage-800">
+                  <app-icon [name]="categoryIcon(ev.category)" sizeClass="h-3 w-3" />
+                  <span>{{ categoryLabel(ev.category) }}</span>
+                </span>
+                <span class="text-xs font-bold text-lavender-700">
+                  {{ ev.isFree ? 'Ücretsiz' : ev.price + ' ₺' }}
+                </span>
+              </div>
+
+              <h3 class="mt-2 text-sm font-bold text-ink-900">{{ ev.title }}</h3>
+              <p class="mt-1 text-xs text-ink-500">
+                {{ ev.date | date: 'dd MMM yyyy · HH:mm' }} · {{ ev.address }}
+              </p>
+
+              <div class="mt-3 flex items-center justify-between border-t border-cream-200 pt-2.5">
+                <span class="text-[11px] text-ink-400">{{ ev.organizerId }}</span>
+                <button
+                  type="button"
+                  (click)="$event.stopPropagation(); openBookingModal(ev)"
+                  class="inline-flex items-center gap-1 rounded-xl bg-sage-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sage-700"
+                >
+                  <app-icon name="qr" sizeClass="h-3.5 w-3.5" />
+                  <span>
+                    {{ eventService.getBookingForEvent(ev.id) ? 'QR Bilet' : 'Rezervasyon' }}
+                  </span>
+                </button>
+              </div>
+            </article>
+          }
+        </aside>
+      </div>
 
       <!-- Katılım & QR Kod Modalı -->
       @if (modalEvent(); as mEvent) {
@@ -208,6 +262,11 @@ export class EventMapComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.map?.invalidateSize();
+  }
+
   ngAfterViewInit(): void {
     this.initMap();
     this.eventService.getNearbyEvents({ lat: 41.015, lng: 29.02, radius: 25_000 }).subscribe();
@@ -226,6 +285,11 @@ export class EventMapComponent implements AfterViewInit, OnDestroy {
           this.selectedEvent.set(list[0] ?? null);
         }
       });
+  }
+
+  protected focusEventOnMap(ev: WellnessEvent): void {
+    this.selectedEvent.set(ev);
+    this.map?.flyTo([ev.latitude, ev.longitude], 14, { duration: 0.7 });
   }
 
   protected locateUser(): void {
@@ -270,7 +334,7 @@ export class EventMapComponent implements AfterViewInit, OnDestroy {
       zoomControl: false,
     });
 
-    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+    L.control.zoom({ position: 'topright' }).addTo(this.map);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO',
@@ -280,7 +344,7 @@ export class EventMapComponent implements AfterViewInit, OnDestroy {
     this.markerLayer = L.layerGroup().addTo(this.map);
     this.renderMarkers(this.eventService.events());
 
-    setTimeout(() => this.map?.invalidateSize(), 150);
+    setTimeout(() => this.map?.invalidateSize(), 200);
   }
 
   private renderMarkers(events: WellnessEvent[]): void {

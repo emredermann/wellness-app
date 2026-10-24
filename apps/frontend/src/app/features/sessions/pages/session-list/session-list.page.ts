@@ -167,12 +167,12 @@ import {
         </section>
       }
 
-      <!-- Kategori Filtreleri -->
-      <div class="flex flex-wrap items-center gap-2">
+      <!-- Kategori Filtreleri (Mobilde yatay kaydırılabilir) -->
+      <div class="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
         <button
           type="button"
           (click)="selectedCategory.set(undefined)"
-          class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
+          class="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
           [class.border-sage-600]="selectedCategory() === undefined"
           [class.bg-sage-600]="selectedCategory() === undefined"
           [class.text-white]="selectedCategory() === undefined"
@@ -186,7 +186,7 @@ import {
           <button
             type="button"
             (click)="selectedCategory.set(cat.value)"
-            class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
+            class="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
             [class.border-sage-600]="selectedCategory() === cat.value"
             [class.bg-sage-600]="selectedCategory() === cat.value"
             [class.text-white]="selectedCategory() === cat.value"
