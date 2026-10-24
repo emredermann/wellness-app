@@ -1,0 +1,175 @@
+// Wellness App — PostgreSQL + PostGIS veri modeli
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat    = "esm"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [postgis]
+}
+
+// ─────────────────────────────── Enums ───────────────────────────────
+
+enum Gender {
+  FEMALE
+  MALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum DietType {
+  VEGAN
+  VEGETARIAN
+  PESCATARIAN
+  REGULAR
+}
+
+enum EventCategory {
+  RUNNING
+  YOGA
+  PILATES
+  SAILING
+  CYCLING
+  HIKING
+  SWIMMING
+  MEDITATION
+  DANCE
+  FITNESS
+  OTHER
+}
+
+enum RsvpStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+enum CyclePhase {
+  MENSTRUAL
+  FOLLICULAR
+  OVULATORY
+  LUTEAL
+}
+
+enum MediaType {
+  VIDEO
+  AUDIO
+}
+
+enum SessionCategory {
+  MEDITATION
+  BREATHING
+  YOGA
+  PILATES
+  SLEEP
+  STRETCHING
+  WORKOUT
+}
+
+// ─────────────────────────────── Models ──────────────────────────────
+
+model User {
+  id                    String    @id @default(uuid()) @db.Uuid
+  email                 String    @unique @db.VarChar(255)
+  passwordHash          String    @map("password_hash")
+  name                  String    @db.VarChar(120)
+  gender                Gender?
+  dietType              DietType  @default(REGULAR) @map("diet_type")
+  bmi                   Decimal?  @db.Decimal(4, 1)
+  cycleStartDate        DateTime? @map("cycle_start_date") @db.Date
+  cycleLength           Int?      @default(28) @map("cycle_length") @db.SmallInt
+  isCycleTrackingActive Boolean   @default(false) @map("is_cycle_tracking_active")
+  kvkkConsent           Boolean   @default(false) @map("kvkk_consent")
+  kvkkConsentAt         DateTime? @map("kvkk_consent_at") // KVKK denetimi için onay zamanı
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  organizedEvents Event[]        @relation("EventOrganizer")
+  bookings        EventBooking[]
+
+  @@map("users")
+}
+
+model Event {
+  id          String        @id @default(uuid()) @db.Uuid
+  title       String        @db.VarChar(200)
+  description String?
+  category    EventCategory
+  latitude    Float
+  longitude   Float
+  /// PostGIS coğrafi nokta (SRID 4326). latitude/longitude'dan DB trigger'ı ile otomatik doldurulur.
+  /// Yakınlık sorguları (ST_DWithin) için $queryRaw ile kullanılır.
+  location    Unsupported("geography(Point, 4326)")?
+  address     String
+  date        DateTime      @db.Timestamptz(6)
+  capacity    Int
+  isFree      Boolean       @default(true) @map("is_free")
+  price       Decimal?      @db.Decimal(10, 2)
+  organizerId String        @map("organizer_id") @db.Uuid
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  organizer User           @relation("EventOrganizer", fields: [organizerId], references: [id], onDelete: Cascade)
+  bookings  EventBooking[]
+
+  @@index([location], type: Gist)
+  @@index([category, date])
+  @@index([organizerId])
+  @@map("events")
+}
+
+model EventBooking {
+  id         String     @id @default(uuid()) @db.Uuid
+  userId     String     @map("user_id") @db.Uuid
+  eventId    String     @map("event_id") @db.Uuid
+  rsvpStatus RsvpStatus @default(CONFIRMED) @map("rsvp_status")
+  qrCode     String     @unique @map("qr_code")
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([eventId, rsvpStatus])
+  @@map("event_bookings")
+}
+
+model Recipe {
+  id                String       @id @default(uuid()) @db.Uuid
+  title             String       @db.VarChar(200)
+  description       String?
+  /// [{ "name": "Mercimek", "amount": 200, "unit": "g" }, ...]
+  ingredients       Json
+  dietType          DietType     @map("diet_type")
+  calories          Int
+  protein           Decimal      @db.Decimal(6, 2)
+  carbs             Decimal      @db.Decimal(6, 2)
+  fat               Decimal      @db.Decimal(6, 2)
+  turkishCuisine    Boolean      @default(false) @map("turkish_cuisine")
+  cyclePhaseSupport CyclePhase[] @map("cycle_phase_support")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  @@index([dietType])
+  @@map("recipes")
+}
+
+model Session {
+  id               String          @id @default(uuid()) @db.Uuid
+  title            String          @db.VarChar(200)
+  durationMinutes  Int             @map("duration_minutes") @db.SmallInt
+  mediaType        MediaType       @map("media_type")
+  mediaUrl         String          @map("media_url")
+  category         SessionCategory
+  recommendedPhase CyclePhase?     @map("recommended_phase")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@index([recommendedPhase])
+  @@map("wellness_sessions")
+}
