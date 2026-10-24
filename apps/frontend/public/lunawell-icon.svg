@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="lw-bg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#55896d"/>
+      <stop offset="0.55" stop-color="#426e57"/>
+      <stop offset="1" stop-color="#74539e"/>
+    </linearGradient>
+    <linearGradient id="lw-petal" x1="32" y1="12" x2="32" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fdfbf8"/>
+      <stop offset="1" stop-color="#efe9f6"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="18" fill="url(#lw-bg)"/>
+  <!-- Moon halo -->
+  <circle cx="32" cy="29" r="16" stroke="#fdfbf8" stroke-opacity="0.22" stroke-width="1.8"/>
+  <!-- Center lotus petal -->
+  <path
+    d="M32 13C37.2 20 40.2 26.8 40.2 32.8a8.2 8.2 0 0 1-16.4 0C23.8 26.8 26.8 20 32 13Z"
+    fill="url(#lw-petal)"
+    fill-opacity="0.95"
+  />
+  <!-- Side lotus petals -->
+  <path
+    d="M24.2 28.5C18.8 27.2 14.5 29.6 12.4 34.5c4.8 5.2 11.2 7.6 19.6 7.6s14.8-2.4 19.6-7.6c-2.1-4.9-6.4-7.3-11.8-6"
+    stroke="#fdfbf8"
+    stroke-width="3.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Gentle base wave -->
+  <path
+    d="M19 47.5c7.8 2.2 18.2 2.2 26 0"
+    stroke="#f2d8a7"
+    stroke-width="3"
+    stroke-linecap="round"
+  />
+</svg>
